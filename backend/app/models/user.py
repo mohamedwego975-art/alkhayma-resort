@@ -1,25 +1,26 @@
-from sqlalchemy import String, Enum as SQLEnum, Index
+from sqlalchemy import String, Boolean, DateTime, Index
 from sqlalchemy.orm import Mapped, mapped_column
-import enum
 from app.core.database import Base
-
+import enum
 
 class UserRole(str, enum.Enum):
-    superadmin = "superadmin"
-    admin = "admin"
-    customer = "customer"
-
+    SUPERADMIN = "superadmin"
+    ADMIN = "admin"
+    STAFF = "staff"
+    GUEST = "guest"
 
 class User(Base):
     __tablename__ = "users"
-
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    password_hash: Mapped[str] = mapped_column(String(255))
-    full_name: Mapped[str] = mapped_column(String(200))
-    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    role: Mapped[UserRole] = mapped_column(SQLEnum(UserRole, name="user_role"), default=UserRole.customer)
-    is_active: Mapped[bool] = mapped_column(default=True)
+    
+    email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    full_name: Mapped[str] = mapped_column(String, nullable=False)
+    phone: Mapped[str] = mapped_column(String)
+    role: Mapped[UserRole] = mapped_column(default=UserRole.GUEST)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_login: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
 
     __table_args__ = (
-        Index("ix_users_role", "role"),
+        Index('ix_users_email', 'email'),
+        Index('ix_users_role', 'role'),
     )

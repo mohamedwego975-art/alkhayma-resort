@@ -1,70 +1,40 @@
-from redis.asyncio import Redis
-from typing import AsyncGenerator, Callable, Any
+import redis.asyncio as redis
 from functools import wraps
 import json
-import os
+import hashlib
+from app.core.config import settings
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+# Redis async client
+redis_client = redis.from_url(settings.redis_url, decode_responses=True)
 
-redis_client: Redis = Redis.from_url(REDIS_URL, decode_responses=True)
+# Dependency to get redis client
+async def get_redis():
+    return redis_client
 
-
-async def get_redis() -> AsyncGenerator[Redis, None]:
-    yield redis_client
-
-
-async def store_refresh_token(user_id: int, refresh_token: str, expire_days: int = 30):
-    """Store refresh token in Redis with TTL"""
-    key = f"refresh_token:{refresh_token}"
-    await redis_client.setex(key, expire_days * 24 * 60 * 60, str(user_id))
-
-
-async def get_user_from_refresh_token(refresh_token: str) -> int | None:
-    """Get user ID from refresh token"""
-    key = f"refresh_token:{refresh_token}"
-    user_id = await redis_client.get(key)
-    return int(user_id) if user_id else None
-
-
-async def blacklist_refresh_token(refresh_token: str):
-    """Blacklist a refresh token"""
-    blacklist_key = f"blacklist:{refresh_token}"
-    await redis_client.setex(blacklist_key, 30 * 24 * 60 * 60, "1")
-    
-    # Delete from valid tokens
-    token_key = f"refresh_token:{refresh_token}"
-    await redis_client.delete(token_key)
-
-
-async def is_token_blacklisted(refresh_token: str) -> bool:
-    """Check if token is blacklisted"""
-    blacklist_key = f"blacklist:{refresh_token}"
-    return await redis_client.exists(blacklist_key) > 0
-
-
+# Cache decorator
 def cache(expire: int = 300, key_prefix: str = "cache"):
-    def decorator(func: Callable) -> Callable:
+    def decorator(func):
         @wraps(func)
-        async def wrapper(*args, **kwargs) -> Any:
-            cache_key = f"{key_prefix}:{func.__name__}:{hash(str(args) + str(kwargs))}"
+        async def wrapper(*args, **kwargs):
+            # Generate cache key
+            key_data = f"{func.__name__}:{args}:{kwargs}"
+            key_hash = hashlib.md5(key_data.encode()).hexdigest()
+            cache_key = f"{key_prefix}:{key_hash}"
             
+            # Try to get from cache
             cached = await redis_client.get(cache_key)
             if cached:
                 return json.loads(cached)
             
+            # Execute function and cache result
             result = await func(*args, **kwargs)
-            await redis_client.setex(cache_key, expire, json.dumps(result))
+            await redis_client.setex(cache_key, expire, json.dumps(result, default=str))
             return result
-        
         return wrapper
     return decorator
 
-
-async def invalidate_pattern(pattern: str) -> int:
-    keys = []
-    async for key in redis_client.scan_iter(match=pattern):
-        keys.append(key)
-    
+# Invalidate cache pattern
+async def invalidate_pattern(pattern: str):
+    keys = await redis_client.keys(pattern)
     if keys:
-        return await redis_client.delete(*keys)
-    return 0
+        await redis_client.delete(*keys)

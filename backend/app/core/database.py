@@ -1,36 +1,36 @@
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, DateTime, func
-from datetime import datetime
-from typing import AsyncGenerator
-import os
+from app.core.config import settings
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:changeme123@localhost:5432/resort_db")
-IS_PRODUCTION = os.getenv("ENVIRONMENT", "development") == "production"
-
+# Create async engine with connection pool
 engine = create_async_engine(
-    DATABASE_URL,
-    echo=not IS_PRODUCTION,
+    settings.database_url,
+    echo=True if settings.environment == "development" else False,
     pool_size=10,
     max_overflow=20,
     pool_pre_ping=True,
-    connect_args={"ssl": False} if not IS_PRODUCTION else {},
+    pool_recycle=300
 )
 
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
+# Create async session factory
+AsyncSessionLocal = sessionmaker(
+    engine, 
+    class_=AsyncSession, 
     expire_on_commit=False,
-    autoflush=False,
+    autoflush=False
 )
 
-
+# Base declarative class
 class Base(DeclarativeBase):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now())
 
-
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+# Dependency to get database session
+async def get_db():
     async with AsyncSessionLocal() as session:
-        yield session
+        try:
+            yield session
+        finally:
+            await session.close()
