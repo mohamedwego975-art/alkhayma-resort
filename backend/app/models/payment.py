@@ -1,32 +1,29 @@
-from sqlalchemy import ForeignKey, String, Numeric, DateTime, JSON, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Column, Integer, ForeignKey, Float, String, DateTime, Enum as SQLEnum, Text
+from sqlalchemy.sql import func
 from app.core.database import Base
 import enum
 
 class PaymentStatus(str, enum.Enum):
     PENDING = "pending"
-    SUCCESS = "success"
+    COMPLETED = "completed"
     FAILED = "failed"
     REFUNDED = "refunded"
 
-class PaymentGateway(str, enum.Enum):
-    PAYMOB = "paymob"
+class PaymentMethod(str, enum.Enum):
     STRIPE = "stripe"
+    FAWRY = "fawry"
+    CASH = "cash"
 
 class Payment(Base):
     __tablename__ = "payments"
-    
-    booking_id: Mapped[int] = mapped_column(ForeignKey("bookings.id", ondelete="CASCADE"), nullable=False)
-    gateway: Mapped[PaymentGateway] = mapped_column(nullable=False)
-    gateway_payment_id: Mapped[str] = mapped_column(String, unique=True, index=True)
-    amount: Mapped[Numeric] = mapped_column(Numeric(10, 2), nullable=False)
-    currency: Mapped[str] = mapped_column(String, default="USD")
-    status: Mapped[PaymentStatus] = mapped_column(default=PaymentStatus.PENDING)
-    gateway_response: Mapped[dict] = mapped_column(JSON, default=dict)
-    paid_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
 
-    __table_args__ = (
-        Index('ix_payments_booking_id', 'booking_id'),
-        Index('ix_payments_gateway_payment_id', 'gateway_payment_id'),
-        Index('ix_payments_status', 'status'),
-    )
+    id = Column(Integer, primary_key=True, index=True)
+    booking_id = Column(Integer, ForeignKey("bookings.id"), nullable=False)
+    amount = Column(Float, nullable=False)
+    currency = Column(String, default="USD", nullable=False)
+    payment_method = Column(SQLEnum(PaymentMethod), nullable=False)
+    status = Column(SQLEnum(PaymentStatus), default=PaymentStatus.PENDING, nullable=False)
+    transaction_id = Column(String, unique=True, nullable=True)
+    payment_metadata = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
