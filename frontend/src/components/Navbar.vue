@@ -36,6 +36,13 @@
             class="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200 dark:border-gray-700"
           >
             <router-link
+              v-if="authStore.user?.role === 'admin'"
+              to="/dashboard"
+              class="text-gray-700 dark:text-gray-300 hover:text-ocean-deep-600 dark:hover:text-ocean-deep-400 font-medium"
+            >
+              <span class="flex items-center gap-2"> <span>📊</span> Dashboard </span>
+            </router-link>
+            <router-link
               to="/account"
               class="text-gray-700 dark:text-gray-300 hover:text-ocean-deep-600 dark:hover:text-ocean-deep-400 font-medium"
             >
