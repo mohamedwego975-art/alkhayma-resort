@@ -1,13 +1,13 @@
 from pydantic_settings import BaseSettings
-
+from pydantic import Field
 
 class Settings(BaseSettings):
-    database_url: str
+    database_url: str = Field(default="postgresql+asyncpg://postgres:changeme123@localhost:5433/resort_db")
     redis_url: str = "redis://localhost:6379"
     environment: str = "development"
     
     # JWT Settings
-    secret_key: str
+    secret_key: str = Field(default="your-secret-key-change-in-production")
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 30
@@ -27,7 +27,10 @@ class Settings(BaseSettings):
     n8n_webhook_url: str | None = None
     
     class Config:
-        env_file = ".env"
+        env_file = "../.env"
+        env_file_encoding = "utf-8"
+        case_sensitive = False
+        extra = "ignore"
 
 
 settings = Settings()
