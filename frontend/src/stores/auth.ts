@@ -1,44 +1,75 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { User } from '@/types'
+import { authApi, type User } from '@/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  const accessToken = ref<string | null>(localStorage.getItem('access_token'))
-  const refreshTokenValue = ref<string | null>(localStorage.getItem('refresh_token'))
   const user = ref<User | null>(null)
+  const token = ref<string | null>(localStorage.getItem('token'))
+  const loading = ref(false)
+  const error = ref<string | null>(null)
 
-  const isAuthenticated = computed(() => !!accessToken.value)
-  const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'superadmin')
+  const isAuthenticated = computed(() => !!token.value)
+  const isAdmin = computed(() => user.value?.role === 'admin')
 
-  async function login(email: string, _password: string) {
-    // Mock implementation for now
-    const mockUser: User = {
-      id: 1,
-      email,
-      full_name: 'Test User',
-      role: 'guest'
+  async function login(email: string, password: string) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await authApi.login({ email, password })
+      token.value = response.data.access_token
+      localStorage.setItem('token', response.data.access_token)
+      await fetchUser()
+      return true
+    } catch (e: any) {
+      error.value = e.response?.data?.error || 'Login failed'
+      return false
+    } finally {
+      loading.value = false
     }
-    
-    accessToken.value = 'mock-token'
-    refreshTokenValue.value = 'mock-refresh-token'
-    user.value = mockUser
-
-    localStorage.setItem('access_token', 'mock-token')
-    localStorage.setItem('refresh_token', 'mock-refresh-token')
-
-    return { access_token: 'mock-token', refresh_token: 'mock-refresh-token', user: mockUser }
   }
 
-  async function logout() {
-    accessToken.value = null
-    refreshTokenValue.value = null
+  async function register(email: string, password: string, full_name: string, phone?: string) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await authApi.register({ email, password, full_name, phone })
+      user.value = response.data
+      await login(email, password)
+      return true
+    } catch (e: any) {
+      error.value = e.response?.data?.error || 'Registration failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchUser() {
+    if (!token.value) return
+    try {
+      const response = await authApi.getMe()
+      user.value = response.data
+    } catch (e) {
+      logout()
+    }
+  }
+
+  function logout() {
     user.value = null
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    token.value = null
+    localStorage.removeItem('token')
   }
 
   return {
-    accessToken, refreshTokenValue, user, isAuthenticated, isAdmin,
-    login, logout,
+    user,
+    token,
+    loading,
+    error,
+    isAuthenticated,
+    isAdmin,
+    login,
+    register,
+    fetchUser,
+    logout,
   }
 })
