@@ -5,12 +5,16 @@ export const useFavoritesStore = defineStore("favorites", () => {
   const favorites = ref<number[]>([]);
 
   // Initialize from localStorage
-  function initialize() {
+  const initialize = (() => {
     const saved = localStorage.getItem("alkhayma-favorites");
     if (saved) {
-      favorites.value = JSON.parse(saved);
+      try {
+        favorites.value = JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse favorites:", e);
+      }
     }
-  }
+  })();
 
   // Toggle favorite
   function toggleFavorite(id: number) {
