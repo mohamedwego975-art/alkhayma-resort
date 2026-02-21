@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
-from app.api.endpoints import auth, bookings
+from app.api.endpoints import auth, bookings, rooms, products
 
 app = FastAPI(
     title="الخيمة Beach Resort API",
@@ -35,3 +35,5 @@ async def root():
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(bookings.router, prefix="/api")
+app.include_router(rooms.router, prefix="/api")
+app.include_router(products.router, prefix="/api")
