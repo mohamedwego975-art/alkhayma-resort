@@ -2,12 +2,12 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql+asyncpg://postgres:changeme123@localhost:5432/resort_db"
+    database_url: str
     redis_url: str = "redis://localhost:6379"
     environment: str = "development"
     
     # JWT Settings
-    secret_key: str = "your-secret-key-change-in-production"
+    secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 30
