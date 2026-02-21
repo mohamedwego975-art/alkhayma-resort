@@ -1,68 +1,72 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-blue-600 to-teal-600 text-white py-32">
-      <div class="max-w-7xl mx-auto px-4 text-center">
-        <h1 class="text-6xl font-bold mb-6">مرحباً بك في منتجع الخيمة</h1>
-        <p class="text-2xl mb-8">استمتع بالفخامة على البحر الأحمر</p>
-        <router-link to="/rooms" class="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
-          احجز الآن
-        </router-link>
-      </div>
-    </div>
-    
-    <!-- Featured Rooms -->
-    <div class="max-w-7xl mx-auto px-4 py-20">
-      <h2 class="text-4xl font-bold mb-12 text-center">الغرف المميزة</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div v-for="i in 3" :key="i" class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition">
-          <div class="h-64 bg-gradient-to-br from-blue-400 to-teal-400"></div>
-          <div class="p-6">
-            <h3 class="text-2xl font-bold mb-2">غرفة ديلوكس {{ i }}</h3>
-            <p class="text-gray-600 mb-4">إطلالة على البحر مع جميع المرافق</p>
-            <div class="flex items-center justify-between">
-              <span class="text-3xl font-bold text-blue-600">$100</span>
-              <span class="text-gray-500">/ ليلة</span>
-            </div>
-            <router-link to="/rooms" class="mt-4 block text-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-              عرض التفاصيل
+    <nav class="bg-white shadow">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <router-link to="/" class="text-2xl font-bold text-blue-600">
+              🏖️ الخيمة Resort
             </router-link>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Services -->
-    <div class="bg-white py-20">
-      <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-4xl font-bold mb-12 text-center">خدماتنا</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div v-for="service in services" :key="service.name" class="text-center p-6">
-            <div class="text-6xl mb-4">{{ service.icon }}</div>
-            <h3 class="text-2xl font-bold mb-2">{{ service.name }}</h3>
-            <p class="text-gray-600">{{ service.description }}</p>
+          <div class="flex items-center space-x-4">
+            <router-link to="/rooms" class="text-gray-700 hover:text-blue-600">Rooms</router-link>
+            <template v-if="authStore.isAuthenticated">
+              <router-link to="/account" class="text-gray-700 hover:text-blue-600">Account</router-link>
+              <button @click="handleLogout" class="text-gray-700 hover:text-blue-600">Logout</button>
+            </template>
+            <template v-else>
+              <router-link to="/login" class="text-gray-700 hover:text-blue-600">Login</router-link>
+              <router-link to="/register" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Register
+              </router-link>
+            </template>
           </div>
         </div>
       </div>
-    </div>
+    </nav>
 
-    <!-- CTA -->
-    <div class="bg-gradient-to-r from-teal-600 to-blue-600 text-white py-20">
-      <div class="max-w-4xl mx-auto px-4 text-center">
-        <h2 class="text-5xl font-bold mb-6">جاهز للحجز؟</h2>
-        <p class="text-xl mb-8">احجز الآن واستمتع بعطلة لا تُنسى</p>
-        <router-link to="/rooms" class="inline-block bg-white text-blue-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
-          استكشف الغرف
+    <main class="max-w-7xl mx-auto py-12 px-4">
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold text-gray-900 mb-4">Welcome to الخيمة Beach Resort</h1>
+        <p class="text-xl text-gray-600">Experience luxury by the sea</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-xl font-bold mb-2">🏨 Luxury Rooms</h3>
+          <p class="text-gray-600">Comfortable rooms with stunning sea views</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-xl font-bold mb-2">🌊 Beach Access</h3>
+          <p class="text-gray-600">Private beach with water sports</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-xl font-bold mb-2">🍽️ Fine Dining</h3>
+          <p class="text-gray-600">Restaurant and cafe with local cuisine</p>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <router-link 
+          to="/rooms" 
+          class="inline-block px-8 py-3 bg-blue-600 text-white text-lg rounded-lg hover:bg-blue-700"
+        >
+          Browse Rooms
         </router-link>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-const services = [
-  { name: 'شاطئ خاص', description: 'شاطئ خاص مع كبائن VIP', icon: '🏖️' },
-  { name: 'مطعم فاخر', description: 'مأكولات عالمية على البحر', icon: '🍽️' },
-  { name: 'أنشطة مائية', description: 'رياضات وأنشطة مثيرة', icon: '🏄' },
-]
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+function handleLogout() {
+  authStore.logout()
+  router.push('/')
+}
 </script>
