@@ -1,11 +1,9 @@
-INFO:     Will watch for changes in these directories: ['/home/wego/Desktop/resort-platform/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [63522] using WatchFiles
-INFO:     Started server process [63524]
+INFO:     Started server process [128004]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:13118 - "GET /docs HTTP/1.1" 200 OK
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [63524]
-INFO:     Stopping reloader process [63522]
+INFO:     Finished server process [128004]
