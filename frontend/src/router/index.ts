@@ -35,8 +35,14 @@ const router = createRouter({
       component: () => import('@/pages/BeachPage.vue')
     },
     {
-      path: '/booking',
+      path: '/booking/:productId?',
       name: 'booking',
+      component: () => import('@/views/BookingView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/booking/confirm',
+      name: 'booking-confirm',
       component: () => import('@/views/BookingView.vue'),
       meta: { requiresAuth: true }
     },
@@ -45,6 +51,12 @@ const router = createRouter({
       name: 'account',
       component: () => import('@/views/AccountView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/views/AccountView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     }
   ]
 })
@@ -54,6 +66,8 @@ router.beforeEach((to, _from, next) => {
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
+  } else if (to.meta.requiresAdmin && authStore.user?.role !== 'admin') {
+    next({ name: 'home' })
   } else {
     next()
   }

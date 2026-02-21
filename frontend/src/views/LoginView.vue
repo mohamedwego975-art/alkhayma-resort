@@ -22,7 +22,7 @@
               v-model="email"
               type="email"
               required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-ocean-deep-500 focus:border-ocean-deep-500"
             />
           </div>
 
@@ -35,7 +35,7 @@
               v-model="password"
               type="password"
               required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-ocean-deep-500 focus:border-ocean-deep-500"
             />
           </div>
         </div>
@@ -43,13 +43,13 @@
         <button
           type="submit"
           :disabled="authStore.loading"
-          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none disabled:opacity-50"
+          class="btn-primary w-full disabled:opacity-50"
         >
-          {{ authStore.loading ? $t('common.loading') : $t('auth.login') }}
+          {{ authStore.loading ? $t('common.loading') : $t('auth.loginButton') }}
         </button>
 
         <div class="text-center">
-          <router-link to="/register" class="text-sm text-blue-600 hover:text-blue-500">
+          <router-link to="/register" class="text-sm text-ocean-deep-600 hover:text-ocean-deep-500">
             {{ $t('auth.noAccount') }}
           </router-link>
         </div>

@@ -6,14 +6,14 @@
       <!-- VIP vs Normal Cards -->
       <div class="grid md:grid-cols-2 gap-8 mb-12">
         <!-- VIP Card -->
-        <div class="bg-white rounded-lg shadow-xl overflow-hidden border-4 border-yellow-500">
-          <div class="h-64 bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl overflow-hidden border-4 border-sand-gold-500">
+          <div class="h-64 bg-gradient-to-r from-sand-gold-400 to-sand-gold-600 flex items-center justify-center">
             <span class="text-white text-8xl">👑</span>
           </div>
           <div class="p-8">
             <div class="flex items-center gap-2 mb-4">
               <h2 class="text-3xl font-bold">VIP Beach</h2>
-              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded">Premium</span>
+              <span class="px-3 py-1 bg-sand-gold-100 text-sand-gold-800 rounded">Premium</span>
             </div>
             <p class="text-gray-600 mb-6">Exclusive beach experience with premium amenities</p>
             
@@ -41,25 +41,25 @@
             </ul>
 
             <div class="mb-6">
-              <span class="text-4xl font-bold text-yellow-600">$150</span>
+              <span class="text-4xl font-bold text-sand-gold-600">$150</span>
               <span class="text-gray-600">/day</span>
             </div>
 
-            <button class="w-full py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-bold">
+            <button class="w-full py-3 bg-sand-gold-500 text-white rounded-lg hover:bg-sand-gold-600 font-bold">
               Book VIP Access
             </button>
           </div>
         </div>
 
         <!-- Normal Card -->
-        <div class="bg-white rounded-lg shadow-xl overflow-hidden border-4 border-blue-500">
-          <div class="h-64 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl overflow-hidden border-4 border-ocean-deep-500">
+          <div class="h-64 bg-gradient-to-r from-ocean-deep-400 to-ocean-deep-600 flex items-center justify-center">
             <span class="text-white text-8xl">🏖️</span>
           </div>
           <div class="p-8">
             <div class="flex items-center gap-2 mb-4">
               <h2 class="text-3xl font-bold">Standard Beach</h2>
-              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded">Popular</span>
+              <span class="px-3 py-1 bg-ocean-deep-100 text-ocean-deep-800 rounded">Popular</span>
             </div>
             <p class="text-gray-600 mb-6">Enjoy our beautiful beach with standard amenities</p>
             
@@ -87,11 +87,11 @@
             </ul>
 
             <div class="mb-6">
-              <span class="text-4xl font-bold text-blue-600">$50</span>
+              <span class="text-4xl font-bold text-ocean-deep-600">$50</span>
               <span class="text-gray-600">/day</span>
             </div>
 
-            <button class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold">
+            <button class="btn-primary w-full">
               Book Standard Access
             </button>
           </div>
@@ -103,18 +103,16 @@
         <h2 class="text-3xl font-bold mb-8 text-center">Water Activities</h2>
         <div class="grid md:grid-cols-3 gap-8">
           <div v-for="activity in activities" :key="activity.name"
-               class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-            <div class="h-48 bg-gradient-to-r from-teal-400 to-blue-500 flex items-center justify-center">
+               class="card hover:scale-105 transition-transform duration-200">
+            <div class="h-48 bg-gradient-to-r from-teal-glow-400 to-ocean-deep-500 flex items-center justify-center">
               <span class="text-white text-6xl">{{ activity.icon }}</span>
             </div>
             <div class="p-6">
               <h3 class="text-xl font-bold mb-2">{{ activity.name }}</h3>
               <p class="text-gray-600 mb-4">{{ activity.description }}</p>
               <div class="flex justify-between items-center">
-                <span class="text-2xl font-bold text-blue-600">${{ activity.price }}</span>
-                <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                  Add
-                </button>
+                <span class="text-2xl font-bold text-ocean-deep-600">${{ activity.price }}</span>
+                <button class="btn-primary text-sm">Add</button>
               </div>
             </div>
           </div>

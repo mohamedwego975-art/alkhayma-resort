@@ -14,42 +14,42 @@
 
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Full Name</label>
+            <label class="block text-sm font-medium text-gray-700">{{ $t('auth.fullName') }}</label>
             <input
               v-model="fullName"
               type="text"
               required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-ocean-deep-500 focus:border-ocean-deep-500"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <label class="block text-sm font-medium text-gray-700">{{ $t('auth.email') }}</label>
             <input
               v-model="email"
               type="email"
               required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-ocean-deep-500 focus:border-ocean-deep-500"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700">Phone (optional)</label>
+            <label class="block text-sm font-medium text-gray-700">{{ $t('auth.phone') }}</label>
             <input
               v-model="phone"
               type="tel"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-ocean-deep-500 focus:border-ocean-deep-500"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700">Password</label>
+            <label class="block text-sm font-medium text-gray-700">{{ $t('auth.password') }}</label>
             <input
               v-model="password"
               type="password"
               required
               minlength="8"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-ocean-deep-500 focus:border-ocean-deep-500"
             />
           </div>
         </div>
@@ -57,14 +57,14 @@
         <button
           type="submit"
           :disabled="authStore.loading"
-          class="w-full py-2 px-4 border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+          class="btn-primary w-full disabled:opacity-50"
         >
-          {{ authStore.loading ? 'Loading...' : 'Register' }}
+          {{ authStore.loading ? $t('common.loading') : $t('auth.registerButton') }}
         </button>
 
         <div class="text-center">
-          <router-link to="/login" class="text-sm text-blue-600 hover:text-blue-500">
-            Already have an account?
+          <router-link to="/login" class="text-sm text-ocean-deep-600 hover:text-ocean-deep-500">
+            {{ $t('auth.haveAccount') }}
           </router-link>
         </div>
       </form>

@@ -32,3 +32,14 @@ export interface Booking {
   total_price: number
   status: 'pending' | 'confirmed' | 'cancelled'
 }
+
+export interface Package {
+  id: number
+  name: string
+  name_ar: string
+  description: string
+  description_ar: string
+  price: number
+  savings: number
+  products: Product[]
+}

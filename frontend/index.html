@@ -2,12 +2,113 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏖️</text></svg>"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <meta name="theme-color" content="#0284c7" />
+
+    <!-- SEO Meta Tags -->
+    <meta
+      name="description"
+      content="الخيمة Beach Resort - Luxury beach resort on the Red Sea, Egypt. Experience premium accommodation, beach activities, and world-class dining."
+    />
+    <meta
+      name="keywords"
+      content="luxury resort, beach resort, Red Sea Egypt, accommodation, vacation"
+    />
+    <meta name="author" content="الخيمة Beach Resort" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph Tags -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="الخيمة Beach Resort - Luxury Accommodation"
+    />
+    <meta
+      property="og:description"
+      content="Experience luxury by the Red Sea. Your perfect escape awaits."
+    />
+    <meta property="og:url" content="https://alkhayma-resort.com" />
+    <meta
+      property="og:image"
+      content="https://alkhayma-resort.com/og-image.jpg"
+    />
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="الخيمة Beach Resort - Luxury Accommodation"
+    />
+    <meta
+      name="twitter:description"
+      content="Experience luxury by the Red Sea."
+    />
+    <meta
+      name="twitter:image"
+      content="https://alkhayma-resort.com/og-image.jpg"
+    />
+
+    <!-- Preconnect to API -->
+    <link rel="preconnect" href="http://localhost:8000" />
+    <link rel="dns-prefetch" href="http://localhost:8000" />
+
+    <!-- Preload Fonts -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap"
+      as="style"
+    />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <title>الخيمة Beach Resort - Luxury Accommodation</title>
   </head>
   <body>
+    <noscript>
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          background: #f9fafb;
+          font-family:
+            system-ui,
+            -apple-system,
+            sans-serif;
+          text-align: center;
+          padding: 2rem;
+        "
+      >
+        <div>
+          <h1 style="font-size: 2rem; margin-bottom: 1rem; color: #1f2937">
+            Welcome to الخيمة Beach Resort
+          </h1>
+          <p style="color: #6b7280; margin-bottom: 1rem; font-size: 1.125rem">
+            This application requires JavaScript to be enabled. Please enable
+            JavaScript in your browser settings.
+          </p>
+        </div>
+      </div>
+    </noscript>
+
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch(() => {
+            // Service Worker registration failed, app will still work
+          });
+        });
+      }
+    </script>
   </body>
 </html>

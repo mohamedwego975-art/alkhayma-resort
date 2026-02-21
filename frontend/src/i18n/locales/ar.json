@@ -15,14 +15,59 @@
     "register": "إنشاء حساب",
     "logout": "تسجيل الخروج"
   },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "noAccount": "ليس لديك حساب؟",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "loginButton": "دخول",
+    "registerButton": "تسجيل",
+    "loginSuccess": "تم تسجيل الدخول بنجاح!",
+    "registerSuccess": "تم إنشاء الحساب بنجاح!",
+    "loginError": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "registerError": "فشل إنشاء الحساب"
+  },
   "home": {
     "hero_title": "مرحباً بك في منتجع الخيمة الشاطئي",
     "hero_subtitle": "استمتع بالفخامة على البحر الأحمر",
     "book_now": "احجز الآن"
   },
+  "rooms": {
+    "title": "غرفنا",
+    "from": "من",
+    "perNight": "/ليلة",
+    "guests": "ضيوف",
+    "view": "عرض",
+    "bookNow": "احجز الآن",
+    "noRooms": "لا توجد غرف متاحة"
+  },
+  "booking": {
+    "checkIn": "تسجيل الوصول",
+    "checkOut": "تسجيل المغادرة",
+    "guests": "الضيوف",
+    "book": "احجز",
+    "total": "الإجمالي",
+    "confirm": "تأكيد الحجز"
+  },
+  "account": {
+    "title": "حسابي",
+    "profile": "الملف الشخصي",
+    "bookings": "حجوزاتي",
+    "settings": "الإعدادات"
+  },
   "common": {
     "loading": "جاري التحميل...",
     "error": "خطأ",
-    "success": "نجح"
+    "success": "نجح",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "edit": "تعديل",
+    "delete": "حذف"
   }
 }

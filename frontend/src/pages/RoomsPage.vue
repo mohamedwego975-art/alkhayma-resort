@@ -1,98 +1,136 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-7xl mx-auto">
-      <h1 class="text-4xl font-bold mb-8">Our Rooms</h1>
+  <div class="min-h-screen bg-white dark:bg-gray-950 transition-colors">
+    <!-- Header -->
+    <div
+      class="bg-gradient-to-r from-ocean-deep-600 to-teal-glow-600 dark:from-ocean-deep-800 dark:to-teal-glow-800 text-white py-16"
+    >
+      <div class="container-responsive text-center">
+        <span class="badge glass-dark text-white mb-4">Accommodation</span>
+        <h1 class="heading-display text-4xl md:text-5xl lg:text-6xl mb-4">Our Luxury Rooms</h1>
+        <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+          Discover comfort and elegance in every corner
+        </p>
+      </div>
+    </div>
 
-      <div v-if="loading" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="i in 6" :key="i" class="bg-white rounded-lg overflow-hidden animate-pulse">
-          <div class="h-64 bg-gray-200"></div>
-          <div class="p-6">
-            <div class="h-6 bg-gray-200 rounded mb-4"></div>
-            <div class="h-4 bg-gray-200 rounded mb-2"></div>
-            <div class="h-4 bg-gray-200 rounded"></div>
-          </div>
+    <div class="container-responsive section-padding">
+      <!-- Breadcrumb -->
+      <Breadcrumb :breadcrumbs="[{ label: 'Rooms', to: '/rooms' }]" class="mb-8" />
+
+      <!-- Filters Section -->
+      <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Sort by
+          </label>
+          <select
+            v-model="sortBy"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-ocean-deep-500"
+          >
+            <option value="price">Price: Low to High</option>
+            <option value="-price">Price: High to Low</option>
+            <option value="rating">Rating: High to Low</option>
+            <option value="capacity">Capacity: High to Low</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Min Price
+          </label>
+          <input
+            v-model.number="minPrice"
+            type="number"
+            placeholder="$0"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-ocean-deep-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Max Price
+          </label>
+          <input
+            v-model.number="maxPrice"
+            type="number"
+            placeholder="$1000"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-ocean-deep-500"
+          />
         </div>
       </div>
 
-      <div v-else class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="room in rooms" :key="room.id" 
-             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
-             @click="$router.push(`/rooms/${room.id}`)">
-          
-          <!-- Image Swiper -->
-          <div class="relative h-64 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
-            <span class="text-white text-8xl">🏨</span>
-            <LiveCounter :product-id="room.id" class="absolute top-4 right-4" />
-          </div>
+      <!-- Loading State -->
+      <SkeletonLoader v-if="loading" :count="6" :cols="3" height="400px" wrapper="div" />
 
-          <div class="p-6">
-            <h3 class="text-2xl font-bold mb-2">Room {{ room.room_number }}</h3>
-            
-            <div class="flex items-center gap-2 mb-4">
-              <span class="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded">
-                {{ room.room_type }}
-              </span>
-              <span class="text-gray-600 text-sm">
-                👥 {{ room.capacity }} guests
-              </span>
-            </div>
-
-            <div class="flex flex-wrap gap-2 mb-4">
-              <span v-if="room.amenities" class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                WiFi
-              </span>
-              <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                AC
-              </span>
-              <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                TV
-              </span>
-            </div>
-
-            <div class="flex justify-between items-center">
-              <div>
-                <span class="text-sm text-gray-600">from</span>
-                <span class="text-2xl font-bold text-blue-600 ml-1">
-                  ${{ room.price_per_night }}
-                </span>
-                <span class="text-sm text-gray-600">/night</span>
-              </div>
-              <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                View
-              </button>
-            </div>
-          </div>
-        </div>
+      <!-- Rooms Grid -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <RoomCard v-for="room in filteredRooms" :key="room.id" :room="room" />
       </div>
 
-      <div v-if="!loading && rooms.length === 0" class="text-center py-12 text-gray-600">
-        No rooms available at the moment.
-      </div>
+      <!-- Empty State -->
+      <EmptyState
+        v-if="!loading && filteredRooms.length === 0"
+        icon="🏨"
+        title="No Rooms Found"
+        message="Try adjusting your filters or check back later"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { roomApi, type Room } from '@/api'
-import LiveCounter from '@/components/smart/LiveCounter.vue'
+import { ref, onMounted, computed } from "vue";
+import { roomApi, type Room } from "@/api";
+import RoomCard from "@/components/RoomCard.vue";
+import SkeletonLoader from "@/components/SkeletonLoader.vue";
+import EmptyState from "@/components/EmptyState.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import { useMeta } from "@/composables/useSEO";
 
-const rooms = ref<Room[]>([])
-const loading = ref(true)
+const rooms = ref<Room[]>([]);
+const loading = ref(true);
+const sortBy = ref("price");
+const minPrice = ref(0);
+const maxPrice = ref(1000);
+
+useMeta({
+  title: "Luxury Rooms - الخيمة Beach Resort",
+  description: "Browse our collection of luxury rooms at الخيمة Beach Resort on the Red Sea",
+  keywords: "luxury rooms, resort accommodation, red sea",
+});
 
 async function fetchRooms() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await roomApi.getAll()
-    rooms.value = response.data
-  } catch (e) {
-    console.error('Failed to fetch rooms:', e)
+    const response = await roomApi.getAll();
+    rooms.value = response.data;
+  } catch (error) {
+    console.error("Failed to fetch rooms:", error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
+const filteredRooms = computed(() => {
+  let result = rooms.value.filter((room) => {
+    return room.price_per_night >= minPrice.value && room.price_per_night <= maxPrice.value;
+  });
+
+  // Sort
+  if (sortBy.value === "price") {
+    result.sort((a, b) => a.price_per_night - b.price_per_night);
+  } else if (sortBy.value === "-price") {
+    result.sort((a, b) => b.price_per_night - a.price_per_night);
+  } else if (sortBy.value === "rating") {
+    result.sort((a, b) => ((b as any).rating || 0) - ((a as any).rating || 0));
+  } else if (sortBy.value === "capacity") {
+    result.sort((a, b) => b.capacity - a.capacity);
+  }
+
+  return result;
+});
+
 onMounted(() => {
-  fetchRooms()
-})
+  fetchRooms();
+});
 </script>

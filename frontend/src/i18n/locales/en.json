@@ -15,14 +15,59 @@
     "register": "Register",
     "logout": "Logout"
   },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "forgotPassword": "Forgot password?",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "loginSuccess": "Login successful!",
+    "registerSuccess": "Registration successful!",
+    "loginError": "Invalid email or password",
+    "registerError": "Registration failed"
+  },
   "home": {
     "hero_title": "Welcome to الخيمة Beach Resort",
     "hero_subtitle": "Experience luxury by the Red Sea",
     "book_now": "Book Now"
   },
+  "rooms": {
+    "title": "Our Rooms",
+    "from": "from",
+    "perNight": "/night",
+    "guests": "guests",
+    "view": "View",
+    "bookNow": "Book Now",
+    "noRooms": "No rooms available"
+  },
+  "booking": {
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "guests": "Guests",
+    "book": "Book",
+    "total": "Total",
+    "confirm": "Confirm Booking"
+  },
+  "account": {
+    "title": "My Account",
+    "profile": "Profile",
+    "bookings": "My Bookings",
+    "settings": "Settings"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 }
