@@ -23,12 +23,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 async def get_or_create(session, model, **kwargs):
     """Get existing record or create new one"""
+    defaults = kwargs.pop('defaults', {})
     result = await session.execute(select(model).filter_by(**kwargs))
     instance = result.scalar_one_or_none()
     if instance:
         return instance, False
     else:
-        instance = model(**kwargs)
+        instance = model(**kwargs, **defaults)
         session.add(instance)
         return instance, True
 

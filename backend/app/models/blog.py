@@ -19,7 +19,6 @@ class BlogPost(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
 
     __table_args__ = (
-        Index('ix_blog_posts_slug', 'slug'),
         Index('ix_blog_posts_is_published', 'is_published'),
         Index('ix_blog_posts_published_at', 'published_at'),
     )
