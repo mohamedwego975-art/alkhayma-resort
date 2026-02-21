@@ -20,13 +20,15 @@ export default defineConfig({
     }
   },
   build: {
+    target: 'es2015',
     rollupOptions: {
       output: {
         manualChunks: {
           'vendor': ['vue', 'vue-router', 'pinia'],
-          'ui': ['@headlessui/vue', 'gsap', 'swiper'],
+          'ui': ['@headlessui/vue', 'gsap', 'swiper']
         }
       }
-    }
+    },
+    chunkSizeWarningLimit: 500
   }
 })

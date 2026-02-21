@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import api from '@/api'
-import type { User, AuthResponse } from '@/types'
+import type { User } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref<string | null>(localStorage.getItem('access_token'))
@@ -11,81 +10,35 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!accessToken.value)
   const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'superadmin')
 
-  async function login(email: string, password: string) {
-    const formData = new FormData()
-    formData.append('username', email)
-    formData.append('password', password)
+  async function login(email: string, _password: string) {
+    // Mock implementation for now
+    const mockUser: User = {
+      id: 1,
+      email,
+      full_name: 'Test User',
+      role: 'guest'
+    }
+    
+    accessToken.value = 'mock-token'
+    refreshTokenValue.value = 'mock-refresh-token'
+    user.value = mockUser
 
-    const response = await api.post<AuthResponse>('/auth/login', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    localStorage.setItem('access_token', 'mock-token')
+    localStorage.setItem('refresh_token', 'mock-refresh-token')
 
-    accessToken.value = response.data.access_token
-    refreshTokenValue.value = response.data.refresh_token
-    user.value = response.data.user
-
-    localStorage.setItem('access_token', response.data.access_token)
-    localStorage.setItem('refresh_token', response.data.refresh_token)
-
-    return response.data
-  }
-
-  async function register(email: string, password: string, full_name: string, phone?: string) {
-    const response = await api.post<AuthResponse>('/auth/register', {
-      email, password, full_name, phone,
-    })
-
-    accessToken.value = response.data.access_token
-    refreshTokenValue.value = response.data.refresh_token
-    user.value = response.data.user
-
-    localStorage.setItem('access_token', response.data.access_token)
-    localStorage.setItem('refresh_token', response.data.refresh_token)
-
-    return response.data
-  }
-
-  async function refreshToken() {
-    if (!refreshTokenValue.value) throw new Error('No refresh token available')
-
-    const response = await api.post<{ access_token: string }>('/auth/refresh', {
-      refresh_token: refreshTokenValue.value,
-    })
-
-    accessToken.value = response.data.access_token
-    localStorage.setItem('access_token', response.data.access_token)
-
-    return response.data
-  }
-
-  async function fetchUser() {
-    if (!accessToken.value) return
-    const response = await api.get<User>('/auth/me')
-    user.value = response.data
+    return { access_token: 'mock-token', refresh_token: 'mock-refresh-token', user: mockUser }
   }
 
   async function logout() {
-    try {
-      if (refreshTokenValue.value) {
-        await api.post('/auth/logout', { refresh_token: refreshTokenValue.value })
-      }
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      accessToken.value = null
-      refreshTokenValue.value = null
-      user.value = null
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-    }
-  }
-
-  if (accessToken.value) {
-    fetchUser().catch(() => { logout() })
+    accessToken.value = null
+    refreshTokenValue.value = null
+    user.value = null
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
   }
 
   return {
     accessToken, refreshTokenValue, user, isAuthenticated, isAdmin,
-    login, register, refreshToken, fetchUser, logout,
+    login, logout,
   }
 })

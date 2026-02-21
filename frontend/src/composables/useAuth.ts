@@ -8,8 +8,6 @@ export function useAuth() {
     isAuthenticated: authStore.isAuthenticated,
     isAdmin: authStore.isAdmin,
     login: authStore.login,
-    register: authStore.register,
     logout: authStore.logout,
-    refreshToken: authStore.refreshToken,
   }
 }
