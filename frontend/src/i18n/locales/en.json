@@ -1,0 +1,28 @@
+{
+  "nav": {
+    "home": "Home",
+    "rooms": "Rooms",
+    "beach": "Beach",
+    "restaurant": "Restaurant",
+    "cafe": "Café",
+    "activities": "Activities",
+    "events": "Events",
+    "packages": "Packages",
+    "blog": "Blog",
+    "account": "My Account",
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero_title": "Welcome to الخيمة Beach Resort",
+    "hero_subtitle": "Experience luxury by the Red Sea",
+    "book_now": "Book Now"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

@@ -1,0 +1,283 @@
+{
+  "name": "post_stay_review",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/webhook/checkout-completed",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "checkout-webhook",
+      "name": "Checkout Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "review_link",
+              "value": "https://resort-platform.com/review/{{ $json.booking_reference }}"
+            },
+            {
+              "name": "user_id",
+              "value": "={{ $json.user_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-review-data",
+      "name": "Set Review Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "hours"
+      },
+      "id": "wait-24-hours",
+      "name": "Wait 24 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromNumber": "whatsapp:+1234567890",
+        "toNumber": "whatsapp:{{ $json.user_phone }}",
+        "message": "كيف كانت إقامتك في الخيمة؟ 🌟\n\nنود أن نسمع رأيك لنحسن خدماتنا أكثر!\n\n⭐ اتركلنا تقييمك هنا:\n{{ $node['Set Review Data'].json.review_link }}\n\nشكراً لاختيارك الخيمة بيتش ريزورت 🏖",
+        "additionalFields": {}
+      },
+      "id": "send-review-request",
+      "name": "Send Review Request",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio-creds",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 48,
+        "unit": "hours"
+      },
+      "id": "wait-48-hours",
+      "name": "Wait 48 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/reviews/check/{{ $json.booking_reference }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "check-review-submitted",
+      "name": "Check Review Submitted",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1340, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "backend-auth",
+          "name": "Backend API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.review_submitted }}",
+              "value2": false
+            }
+          ]
+        }
+      },
+      "id": "check-no-review",
+      "name": "Check No Review",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "fromNumber": "whatsapp:+1234567890",
+        "toNumber": "whatsapp:{{ $json.user_phone }}",
+        "message": "تذكير أخير 🔔\n\nما زلنا نتطلع لسماع رأيك في إقامتك بالخيمة!\n\n⭐ تقييمك يساعدنا كثيراً:\n{{ $node['Set Review Data'].json.review_link }}\n\nشكراً لوقتك 🙏",
+        "additionalFields": {}
+      },
+      "id": "send-reminder",
+      "name": "Send Reminder",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1780, 200],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio-creds",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.user_email }}",
+        "subject": "تقييم إقامتك في الخيمة بيتش ريزورت",
+        "emailType": "html",
+        "message": "<!DOCTYPE html><html><head><style>body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f5f5f5}.container{max-width:600px;margin:0 auto;background:white;border-radius:10px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1)}.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;text-align:center}.content{padding:30px}.review-box{background:#fff3cd;border:2px solid #ffc107;padding:20px;border-radius:8px;margin:20px 0;text-align:center}.stars{font-size:30px;margin:20px 0}.cta-button{background:#28a745;color:white;padding:15px 30px;text-decoration:none;border-radius:5px;display:inline-block;font-weight:bold}</style></head><body><div class='container'><div class='header'><h1>🏖 الخيمة Beach Resort</h1><h2>كيف كانت إقامتك؟</h2></div><div class='content'><p>عزيزي/عزيزتي {{ $json.user_name }},</p><p>نأمل أن تكون قد استمتعت بإقامتك في الخيمة بيتش ريزورت!</p><div class='review-box'><div class='stars'>⭐⭐⭐⭐⭐</div><h3>شاركنا تجربتك</h3><p>تقييمك يساعدنا على تحسين خدماتنا وتقديم أفضل تجربة للضيوف</p><a href='{{ $node[\"Set Review Data\"].json.review_link }}' class='cta-button'>اترك تقييمك الآن</a></div><p>شكراً لاختيارك الخيمة بيتش ريزورت ونتطلع لاستقبالك مرة أخرى! 🌟</p></div></div></body></html>",
+        "options": {}
+      },
+      "id": "send-review-email",
+      "name": "Send Review Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [1120, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-creds",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"status\": \"success\", \"message\": \"Review workflow triggered\" }"
+      },
+      "id": "response",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2000, 300]
+    }
+  ],
+  "connections": {
+    "Checkout Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Review Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Review Data": {
+      "main": [
+        [
+          {
+            "node": "Wait 24 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 24 Hours": {
+      "main": [
+        [
+          {
+            "node": "Send Review Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Request": {
+      "main": [
+        [
+          {
+            "node": "Send Review Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait 48 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Email": {
+      "main": [
+        [
+          {
+            "node": "Wait 48 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 48 Hours": {
+      "main": [
+        [
+          {
+            "node": "Check Review Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Review Submitted": {
+      "main": [
+        [
+          {
+            "node": "Check No Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check No Review": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1"
+}

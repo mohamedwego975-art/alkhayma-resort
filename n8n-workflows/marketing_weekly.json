@@ -1,0 +1,258 @@
+{
+  "name": "marketing_weekly",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "schedule-monday",
+      "name": "Schedule Monday 10am",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/admin/analytics/overview",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-analytics",
+      "name": "Get Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "backend-auth",
+          "name": "Backend API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.occupancy_rate }}",
+              "operation": "smaller",
+              "value2": 60
+            }
+          ]
+        }
+      },
+      "id": "check-low-occupancy",
+      "name": "Check Low Occupancy",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/admin/users?status=guest&last_stay_within=6months",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-past-guests",
+      "name": "Get Past Guests",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [900, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "backend-auth",
+          "name": "Backend API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "content": "أنت مسوق محترف للخيمة بيتش ريزورت في شرم الشيخ. اكتب رسالة تسويقية جذابة (100 كلمة كحد أقصى) لضيوف سابقين لتشجيعهم على العودة. \n\nمعلومات السياق:\n- معدل الإشغال الحالي: {{ $node['Get Analytics'].json.occupancy_rate }}%\n- الموسم: {{ DateTime.now().month <= 3 || DateTime.now().month >= 11 ? 'شتاء' : 'صيف' }}\n- عروض خاصة: خصم 20% للعائدين\n\nاكتب الرسالة بالعربية، ودودة ومحفزة للحجز.",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "generate-promo-message",
+      "name": "Generate Promo Message",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [1120, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-creds",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "users",
+        "options": {}
+      },
+      "id": "split-users",
+      "name": "Split Users",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "marketing_message",
+              "value": "{{ $node['Generate Promo Message'].json.choices[0].message.content }}\n\n🎯 عرض خاص للعائدين: خصم 20%\n📱 احجز الآن: https://resort-platform.com/booking\n📞 واتساب: +20123456789"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "format-message",
+      "name": "Format Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {
+        "fromNumber": "whatsapp:+1234567890",
+        "toNumber": "whatsapp:{{ $json.phone }}",
+        "message": "{{ $node['Format Message'].json.marketing_message }}",
+        "additionalFields": {}
+      },
+      "id": "send-marketing-message",
+      "name": "Send Marketing Message",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1780, 200],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio-creds",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "{{ $json.email }}",
+        "subject": "عرض خاص من الخيمة بيتش ريزورت - خصم 20% للعائدين",
+        "emailType": "html",
+        "message": "<!DOCTYPE html><html><head><style>body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f5f5f5}.container{max-width:600px;margin:0 auto;background:white;border-radius:10px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1)}.header{background:linear-gradient(135deg,#ff6b6b 0%,#ffa500 100%);color:white;padding:30px;text-align:center}.content{padding:30px}.offer-box{background:#fff3cd;border:2px solid #ffc107;padding:20px;border-radius:8px;margin:20px 0;text-align:center}.cta-button{background:#28a745;color:white;padding:15px 30px;text-decoration:none;border-radius:5px;display:inline-block;font-weight:bold;margin:20px 0}</style></head><body><div class='container'><div class='header'><h1>🏖 الخيمة Beach Resort</h1><h2>عرض خاص للعائدين!</h2></div><div class='content'><p>عزيزي/عزيزتي {{ $json.name }},</p><p>{{ $node['Generate Promo Message'].json.choices[0].message.content }}</p><div class='offer-box'><h3>🎯 عرض محدود</h3><h2 style='color:#dc3545;margin:10px 0'>خصم 20% للضيوف العائدين</h2><p>صالح حتى نهاية الشهر</p></div><div style='text-align:center'><a href='https://resort-platform.com/booking' class='cta-button'>احجز الآن واستفد من الخصم</a></div><p>📞 للحجز والاستفسار: واتساب +20123456789</p><p>نتطلع لاستقبالك مرة أخرى في الخيمة! 🌟</p></div></div></body></html>",
+        "options": {}
+      },
+      "id": "send-marketing-email",
+      "name": "Send Marketing Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [1780, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-creds",
+          "name": "Gmail Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Monday 10am": {
+      "main": [
+        [
+          {
+            "node": "Get Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Analytics": {
+      "main": [
+        [
+          {
+            "node": "Check Low Occupancy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Low Occupancy": {
+      "main": [
+        [
+          {
+            "node": "Get Past Guests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Past Guests": {
+      "main": [
+        [
+          {
+            "node": "Generate Promo Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Promo Message": {
+      "main": [
+        [
+          {
+            "node": "Split Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Users": {
+      "main": [
+        [
+          {
+            "node": "Format Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Message": {
+      "main": [
+        [
+          {
+            "node": "Send Marketing Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Marketing Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1"
+}

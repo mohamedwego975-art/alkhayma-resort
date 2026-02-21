@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply bg-white text-gray-900 antialiased;
+  }
+  
+  [dir="rtl"] {
+    font-family: 'Cairo', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-ocean-deep-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-ocean-deep-700 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-teal-glow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-glow-600 transition-colors;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-lg overflow-hidden;
+  }
+}

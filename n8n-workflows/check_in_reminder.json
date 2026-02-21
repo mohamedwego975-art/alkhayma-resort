@@ -1,0 +1,237 @@
+{
+  "name": "check_in_reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-hourly",
+      "name": "Schedule Hourly",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tomorrow_date",
+              "value": "={{ DateTime.now().plus({days: 1}).toFormat('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "api_url",
+              "value": "http://localhost:8000/api/admin/bookings?check_in={{ DateTime.now().plus({days: 1}).toFormat('yyyy-MM-dd') }}&status=confirmed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-tomorrow",
+      "name": "Set Tomorrow Date",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.api_url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer admin-token"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-bookings",
+      "name": "Get Tomorrow Bookings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "backend-auth",
+          "name": "Backend API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.length }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "check-bookings-exist",
+      "name": "Check Bookings Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "bookings",
+        "options": {}
+      },
+      "id": "split-bookings",
+      "name": "Split Bookings",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "whatsapp_reminder",
+              "value": "تذكير: موعدك في الخيمة غداً ☀️\n\n👤 {{ $json.user_name }}\n🏖 {{ $json.product_name }}\n📅 {{ $json.check_in }}\n⏰ وصولك المتوقع: 2:00 ظهراً\n\nتحتاج مساعدة؟ رد على هذه الرسالة 💬"
+            },
+            {
+              "name": "email_subject",
+              "value": "تذكير: موعدك في الخيمة غداً - {{ $json.booking_reference }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-reminder-messages",
+      "name": "Set Reminder Messages",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "fromNumber": "whatsapp:+1234567890",
+        "toNumber": "whatsapp:{{ $json.user_phone }}",
+        "message": "={{ $node['Set Reminder Messages'].json.whatsapp_reminder }}",
+        "additionalFields": {}
+      },
+      "id": "send-whatsapp-reminder",
+      "name": "Send WhatsApp Reminder",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1560, 100],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio-creds",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.user_email }}",
+        "subject": "={{ $node['Set Reminder Messages'].json.email_subject }}",
+        "emailType": "html",
+        "message": "<!DOCTYPE html><html><head><style>body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f5f5f5}.container{max-width:600px;margin:0 auto;background:white;border-radius:10px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1)}.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;text-align:center}.content{padding:30px}.info-box{background:#e3f2fd;padding:20px;border-radius:8px;margin:20px 0;border-left:4px solid #2196f3}.map-section{background:#f8f9fa;padding:20px;border-radius:8px;margin:20px 0;text-align:center}</style></head><body><div class='container'><div class='header'><h1>🏖 الخيمة Beach Resort</h1><h2>تذكير بموعدك غداً</h2></div><div class='content'><p>عزيزي/عزيزتي {{ $json.user_name }},</p><p>نذكرك بموعدك في الخيمة بيتش ريزورت غداً!</p><div class='info-box'><h3>📋 تفاصيل الحجز:</h3><p><strong>رقم الحجز:</strong> {{ $json.booking_reference }}</p><p><strong>المنتج:</strong> {{ $json.product_name }}</p><p><strong>التاريخ:</strong> {{ $json.check_in }}</p><p><strong>وقت الوصول:</strong> من 2:00 ظهراً</p></div><div class='info-box'><h3>📝 تعليمات الوصول:</h3><ul><li>🚗 مواقف مجانية متاحة</li><li>📱 أحضر هاتفك لعرض رقم الحجز</li><li>🏊‍♂️ ملابس السباحة وواقي الشمس</li><li>💳 يمكن الدفع نقداً أو بالكارت</li></ul></div><div class='map-section'><h3>📍 موقع المنتجع</h3><p><a href='https://maps.google.com/?q=Sharm+El+Sheikh+Beach' style='background:#2196f3;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;display:inline-block'>عرض على الخريطة</a></p></div><p>للاستفسارات: واتساب +20123456789</p><p>نتطلع لاستقبالك! 🌟</p></div></div></body></html>",
+        "options": {}
+      },
+      "id": "send-email-reminder",
+      "name": "Send Email Reminder",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [1560, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-creds",
+          "name": "Gmail Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Hourly": {
+      "main": [
+        [
+          {
+            "node": "Set Tomorrow Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Tomorrow Date": {
+      "main": [
+        [
+          {
+            "node": "Get Tomorrow Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Tomorrow Bookings": {
+      "main": [
+        [
+          {
+            "node": "Check Bookings Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Bookings Exist": {
+      "main": [
+        [
+          {
+            "node": "Split Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Bookings": {
+      "main": [
+        [
+          {
+            "node": "Set Reminder Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Reminder Messages": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reminder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1"
+}
