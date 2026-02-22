@@ -2,23 +2,23 @@
   <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-5xl mx-auto">
       <h1 class="text-4xl font-bold text-center text-gray-900 mb-4">
-        {{ $t('faq.title', 'Project Pages Index') }}
+        Project Pages Index
       </h1>
       <p class="text-center text-gray-600 mb-12">
-        {{ $t('faq.subtitle', 'Complete list of all frontend and admin dashboard pages') }}
+        Complete list of all frontend and admin dashboard pages
       </p>
 
       <!-- Frontend Pages Section -->
       <div class="mb-12">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b-2 border-ocean-deep-500">
-          {{ $t('faq.frontendPages', 'Frontend Pages') }}
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b-2 border-blue-500">
+          Frontend Pages
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <router-link
             v-for="page in frontendPages"
             :key="page.path"
             :to="page.path"
-            class="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 hover:border-ocean-deep-400"
+            class="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 hover:border-blue-400"
           >
             <div class="flex items-center">
               <span class="text-2xl mr-3">{{ page.icon }}</span>
@@ -33,15 +33,15 @@
 
       <!-- Admin Dashboard Pages Section -->
       <div class="mb-12">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b-2 border-ocean-deep-500">
-          {{ $t('faq.adminPages', 'Admin Dashboard Pages') }}
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b-2 border-blue-500">
+          Admin Dashboard Pages
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <router-link
             v-for="page in adminPages"
             :key="page.path"
             :to="page.path"
-            class="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 hover:border-ocean-deep-400"
+            class="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 hover:border-blue-400"
           >
             <div class="flex items-center">
               <span class="text-2xl mr-3">{{ page.icon }}</span>
@@ -56,15 +56,15 @@
 
       <!-- Auth Pages Section -->
       <div class="mb-12">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b-2 border-ocean-deep-500">
-          {{ $t('faq.authPages', 'Authentication Pages') }}
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b-2 border-blue-500">
+          Authentication Pages
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <router-link
             v-for="page in authPages"
             :key="page.path"
             :to="page.path"
-            class="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 hover:border-ocean-deep-400"
+            class="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 hover:border-blue-400"
           >
             <div class="flex items-center">
               <span class="text-2xl mr-3">{{ page.icon }}</span>
@@ -78,28 +78,28 @@
       </div>
 
       <!-- System Info -->
-      <div class="bg-ocean-deep-50 rounded-lg p-6 mt-8">
-        <h3 class="text-lg font-semibold text-ocean-deep-900 mb-4">
-          {{ $t('faq.systemInfo', 'System Information') }}
+      <div class="bg-blue-50 rounded-lg p-6 mt-8">
+        <h3 class="text-lg font-semibold text-blue-900 mb-4">
+          System Information
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
-            <strong>{{ $t('faq.frontendUrl', 'Frontend URL:') }}</strong>
-            <a href="http://localhost:5174" target="_blank" class="text-ocean-deep-600 hover:underline">
+            <strong>Frontend URL:</strong>
+            <a href="http://localhost:5174" target="_blank" class="text-blue-600 hover:underline">
               http://localhost:5174
             </a>
           </div>
           <div>
-            <strong>{{ $t('faq.backendUrl', 'Backend API:') }}</strong>
-            <a href="http://localhost:8000/api" target="_blank" class="text-ocean-deep-600 hover:underline">
+            <strong>Backend API:</strong>
+            <a href="http://localhost:8000/api" target="_blank" class="text-blue-600 hover:underline">
               http://localhost:8000/api
             </a>
           </div>
           <div>
-            <strong>{{ $t('faq.totalPages', 'Total Pages:') }}</strong> {{ totalPages }}
+            <strong>Total Pages:</strong> {{ totalPages }}
           </div>
           <div>
-            <strong>{{ $t('faq.adminPages', 'Admin Pages:') }}</strong> {{ adminPages.length }}
+            <strong>Admin Pages:</strong> {{ adminPages.length }}
           </div>
         </div>
       </div>
@@ -144,9 +144,3 @@ const totalPages = computed(() => {
   return frontendPages.length + adminPages.length + authPages.length
 })
 </script>
-
-<style scoped>
-.router-link-active {
-  @apply border-ocean-deep-500 bg-ocean-deep-50;
-}
-</style>
