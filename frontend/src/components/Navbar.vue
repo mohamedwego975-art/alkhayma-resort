@@ -174,6 +174,7 @@ const navLinks = [
   { path: "/", label: "Home" },
   { path: "/rooms", label: "Rooms" },
   { path: "/beach", label: "Beach" },
+  { path: "/location", label: "Location" },
 ];
 
 function handleLogout() {

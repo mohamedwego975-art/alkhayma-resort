@@ -2,7 +2,9 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
-from app.api.endpoints import auth, bookings, rooms, products
+from app.api.endpoints import auth, bookings, rooms, products, notifications
+from app.api import analytics
+from app.services import email_service, whatsapp_service
 
 app = FastAPI(
     title="الخيمة Beach Resort API",
@@ -33,7 +35,15 @@ async def health_check():
 async def root():
     return {"message": "الخيمة Beach Resort API", "version": "1.0.0"}
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup."""
+    await email_service.initialize()
+    await whatsapp_service.initialize()
+
 app.include_router(auth.router, prefix="/api")
 app.include_router(bookings.router, prefix="/api")
 app.include_router(rooms.router, prefix="/api")
 app.include_router(products.router, prefix="/api")
+app.include_router(notifications.router, prefix="/api")
+app.include_router(analytics.router)

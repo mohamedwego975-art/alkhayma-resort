@@ -96,7 +96,40 @@
     "guests": "guests",
     "view": "View",
     "bookNow": "Book Now",
-    "noRooms": "No rooms available"
+    "noRooms": "No rooms available",
+    "standard": "Standard",
+    "deluxe": "Deluxe",
+    "suite": "Suite",
+    "villa": "Villa",
+    "room": "Room"
+  },
+  "search": {
+    "placeholder": "Search rooms, activities...",
+    "filters": "Filters",
+    "price_low": "Price: Low to High",
+    "price_high": "Price: High to Low",
+    "rating_high": "Highest Rated",
+    "name_az": "Name: A-Z",
+    "priceRange": "Price Range",
+    "min": "Min",
+    "max": "Max",
+    "roomType": "Room Type",
+    "all": "All Types",
+    "guests": "Guests",
+    "guest": "Guest",
+    "any": "Any",
+    "amenities": "Amenities",
+    "clearFilters": "Clear All Filters"
+  },
+  "amenities": {
+    "wifi": "WiFi",
+    "ac": "Air Conditioning",
+    "tv": "TV",
+    "minibar": "Minibar",
+    "balcony": "Balcony",
+    "jacuzzi": "Jacuzzi",
+    "kitchen": "Kitchen",
+    "seaView": "Sea View"
   },
   "booking": {
     "checkIn": "Check In",
@@ -104,7 +137,18 @@
     "guests": "Guests",
     "book": "Book",
     "total": "Total",
-    "confirm": "Confirm Booking"
+    "confirm": "Confirm Booking",
+    "selectDates": "Select Your Dates",
+    "nights": "nights",
+    "serviceFee": "Service Fee",
+    "taxes": "Taxes & Fees",
+    "bookNow": "Book Now",
+    "checkingAvailability": "Checking availability...",
+    "available": "Available for your dates",
+    "notAvailable": "Not available for selected dates",
+    "cancellationPolicy": "Free cancellation up to 24 hours before check-in",
+    "success": "Booking Initiated",
+    "redirecting": "Redirecting to booking page..."
   },
   "account": {
     "title": "My Account",

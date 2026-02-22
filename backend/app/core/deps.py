@@ -59,3 +59,8 @@ def require_role(*allowed_roles: UserRole):
             )
         return current_user
     return role_checker
+
+
+# Pre-defined role requirements
+require_admin = require_role(UserRole.ADMIN)
+require_staff = require_role(UserRole.ADMIN, UserRole.STAFF)

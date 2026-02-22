@@ -96,7 +96,40 @@
     "guests": "ضيوف",
     "view": "عرض",
     "bookNow": "احجز الآن",
-    "noRooms": "لا توجد غرف متاحة"
+    "noRooms": "لا توجد غرف متاحة",
+    "standard": "قياسية",
+    "deluxe": "ديلوكس",
+    "suite": "جناح",
+    "villa": "فيلا",
+    "room": "غرفة"
+  },
+  "search": {
+    "placeholder": "ابحث عن غرف، أنشطة...",
+    "filters": "الفلاتر",
+    "price_low": "السعر: من الأقل للأعلى",
+    "price_high": "السعر: من الأعلى للأقل",
+    "rating_high": "الأعلى تقييماً",
+    "name_az": "الاسم: أ-ي",
+    "priceRange": "نطاق السعر",
+    "min": "الأدنى",
+    "max": "الأقصى",
+    "roomType": "نوع الغرفة",
+    "all": "جميع الأنواع",
+    "guests": "الضيوف",
+    "guest": "ضيف",
+    "any": "أي عدد",
+    "amenities": "المرافق",
+    "clearFilters": "مسح جميع الفلاتر"
+  },
+  "amenities": {
+    "wifi": "واي فاي",
+    "ac": "تكييف",
+    "tv": "تلفاز",
+    "minibar": "ميني بار",
+    "balcony": "شرفة",
+    "jacuzzi": "جاكوزي",
+    "kitchen": "مطبخ",
+    "seaView": "إطلالة بحرية"
   },
   "booking": {
     "checkIn": "تسجيل الوصول",
@@ -104,7 +137,18 @@
     "guests": "الضيوف",
     "book": "احجز",
     "total": "الإجمالي",
-    "confirm": "تأكيد الحجز"
+    "confirm": "تأكيد الحجز",
+    "selectDates": "اختر تواريخك",
+    "nights": "ليالي",
+    "serviceFee": "رسوم الخدمة",
+    "taxes": "الضرائب والرسوم",
+    "bookNow": "احجز الآن",
+    "checkingAvailability": "جاري التحقق من التوفر...",
+    "available": "متاح للتواريخ المحددة",
+    "notAvailable": "غير متاح للتواريخ المحددة",
+    "cancellationPolicy": "إلغاء مجاني حتى 24 ساعة قبل تسجيل الوصول",
+    "success": "تم بدء الحجز",
+    "redirecting": "جاري التوجيه لصفحة الحجز..."
   },
   "account": {
     "title": "حسابي",

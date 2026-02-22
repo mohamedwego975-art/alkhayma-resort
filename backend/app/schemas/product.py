@@ -9,10 +9,12 @@ class ProductResponse(BaseModel):
     description: Optional[str] = None
     description_ar: Optional[str] = None
     type: str
-    price: float
-    stock: int
+    base_price: float
+    capacity: int
     is_active: bool
-    images: Optional[list] = None
+    images: Optional[dict] = None
+    amenities: Optional[dict] = None
+    tags: Optional[dict] = None
     created_at: datetime
     
     class Config:
@@ -24,6 +26,6 @@ class ProductCreate(BaseModel):
     description: Optional[str] = None
     description_ar: Optional[str] = None
     type: str
-    price: float = Field(ge=0)
-    stock: int = Field(ge=0)
+    base_price: float = Field(ge=0)
+    capacity: int = Field(ge=1, default=1)
     is_active: bool = True

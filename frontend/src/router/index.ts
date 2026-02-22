@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +34,11 @@ const router = createRouter({
       component: () => import('@/pages/BeachPage.vue')
     },
     {
+      path: '/location',
+      name: 'location',
+      component: () => import('@/pages/LocationPage.vue')
+    },
+    {
       path: '/booking/:productId?',
       name: 'booking',
       component: () => import('@/views/BookingView.vue'),
@@ -61,9 +65,10 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
+  const { useAuthStore } = await import('@/stores/auth')
   const authStore = useAuthStore()
-  
+
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
   } else if (to.meta.requiresAdmin && authStore.user?.role !== 'admin') {
