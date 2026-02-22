@@ -10,6 +10,9 @@ from datetime import datetime
 import os
 from contextlib import asynccontextmanager
 
+# Import sentiment analysis
+from sentiment import SentimentAnalyzer, SentimentLabel, get_analyzer, ReviewAnalysis
+
 # Models
 class ChatRequest(BaseModel):
     message: str
@@ -296,6 +299,98 @@ async def upsell(request: UpsellRequest):
     except Exception as e:
         print(f"Upsell error: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+# Sentiment Analysis Models
+class SentimentRequest(BaseModel):
+    review_text: str
+    review_id: Optional[str] = None
+
+class BatchSentimentRequest(BaseModel):
+    reviews: List[Dict[str, str]]  # List of {id, text} dicts
+
+class SentimentResponse(BaseModel):
+    review_id: str
+    sentiment: str
+    confidence: float
+    score: float
+    key_topics: List[str]
+    aspects: Dict[str, Any]
+    summary: str
+    action_required: bool
+    priority: str
+
+class AggregateStatsResponse(BaseModel):
+    total_reviews: int
+    average_sentiment: float
+    sentiment_distribution: Dict[str, int]
+    sentiment_percentages: Dict[str, float]
+    top_topics: List[Dict[str, Any]]
+    action_required_count: int
+    high_priority_count: int
+
+# Sentiment Analysis Endpoints
+@app.post("/analyze-sentiment", response_model=SentimentResponse)
+async def analyze_sentiment(request: SentimentRequest):
+    """Analyze sentiment of a single review."""
+    try:
+        analyzer = get_analyzer()
+        result = await analyzer.analyze_review(
+            review_text=request.review_text,
+            review_id=request.review_id or ""
+        )
+        
+        return SentimentResponse(
+            review_id=result.review_id,
+            sentiment=result.sentiment.value,
+            confidence=result.confidence,
+            score=result.score,
+            key_topics=result.key_topics,
+            aspects=result.aspects,
+            summary=result.summary,
+            action_required=result.action_required,
+            priority=result.priority
+        )
+    except Exception as e:
+        print(f"Sentiment analysis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/analyze-sentiment/batch", response_model=List[SentimentResponse])
+async def analyze_sentiment_batch(request: BatchSentimentRequest):
+    """Analyze sentiment of multiple reviews in batch."""
+    try:
+        analyzer = get_analyzer()
+        results = await analyzer.analyze_batch(request.reviews)
+        
+        return [
+            SentimentResponse(
+                review_id=r.review_id,
+                sentiment=r.sentiment.value,
+                confidence=r.confidence,
+                score=r.score,
+                key_topics=r.key_topics,
+                aspects=r.aspects,
+                summary=r.summary,
+                action_required=r.action_required,
+                priority=r.priority
+            )
+            for r in results
+        ]
+    except Exception as e:
+        print(f"Batch sentiment analysis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/analyze-sentiment/stats", response_model=AggregateStatsResponse)
+async def analyze_sentiment_stats(request: BatchSentimentRequest):
+    """Get aggregate sentiment statistics for multiple reviews."""
+    try:
+        analyzer = get_analyzer()
+        analyses = await analyzer.analyze_batch(request.reviews)
+        stats = analyzer.get_aggregate_stats(analyses)
+        
+        return AggregateStatsResponse(**stats)
+    except Exception as e:
+        print(f"Sentiment stats error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
 async def health_check():

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import select
 from app.core.config import settings
 from app.api.endpoints import auth, bookings, rooms, products, notifications
 from app.api import analytics
@@ -27,9 +28,34 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"error": "Internal server error", "code": "INTERNAL_ERROR", "details": {}}
     )
 
-@app.get("/health")
+@app.get("/api/health")
 async def health_check():
-    return {"status": "healthy"}
+    """Health check endpoint that verifies DB and Redis connections."""
+    db_status = "ok"
+    redis_status = "ok"
+    
+    try:
+        # Check DB connection
+        from app.core.database import engine
+        async with engine.connect() as conn:
+            await conn.execute(select(1))
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    try:
+        # Check Redis connection
+        from app.core.redis import redis_client
+        await redis_client.ping()
+    except Exception as e:
+        redis_status = f"error: {str(e)}"
+    
+    overall_status = "ok" if db_status == "ok" and redis_status == "ok" else "degraded"
+    
+    return {
+        "status": overall_status,
+        "db": db_status,
+        "redis": redis_status
+    }
 
 @app.get("/")
 async def root():

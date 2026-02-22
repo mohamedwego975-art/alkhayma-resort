@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- AI Chat Bubble -->
+    <ChatBubble />
+
     <!-- Hero Section -->
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
       <div class="absolute inset-0 gradient-animated"></div>
