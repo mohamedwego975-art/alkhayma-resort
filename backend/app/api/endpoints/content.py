@@ -277,3 +277,45 @@ async def get_activities_content() -> Dict[str, Any]:
 async def get_faq_content() -> List[Dict[str, str]]:
     """Get FAQ content"""
     return PAGE_CONTENT["faq"]
+@router.get("/blog")
+async def get_blog_posts() -> List[Dict[str, Any]]:
+    """Get blog posts content"""
+    blog_posts = [
+        {
+            "id": 1,
+            "title": "Top 5 Beach Activities in Red Sea",
+            "slug": "top-5-beach-activities",
+            "excerpt": "Discover the most exciting water sports and beach activities available at our resort.",
+            "content": "The Red Sea offers some of the world's best beach experiences...",
+            "author": "Resort Blog",
+            "published_at": "2026-02-15",
+            "featured_image": "https://via.placeholder.com/800x400",
+            "category": "Activities",
+            "read_time": "5 min"
+        },
+        {
+            "id": 2,
+            "title": "Planning the Perfect Beach Wedding",
+            "slug": "perfect-beach-wedding",
+            "excerpt": "A complete guide to planning your dream wedding on the beach.",
+            "content": "Getting married on the beach is a magical experience...",
+            "author": "Events Team",
+            "published_at": "2026-02-10",
+            "featured_image": "https://via.placeholder.com/800x400",
+            "category": "Events",
+            "read_time": "7 min"
+        },
+        {
+            "id": 3,
+            "title": "Luxury Dining Experience at Our Restaurant",
+            "slug": "luxury-dining-experience",
+            "excerpt": "Explore our world-class cuisine and dining facilities.",
+            "content": "Our restaurant offers authentic Egyptian and international cuisine...",
+            "author": "Chef Ali",
+            "published_at": "2026-02-05",
+            "featured_image": "https://via.placeholder.com/800x400",
+            "category": "Dining",
+            "read_time": "4 min"
+        }
+    ]
+    return blog_posts
