@@ -1,1 +1,1 @@
-from .endpoints import auth, booking, content, payment, user
+from .endpoints import auth, bookings, content, rooms, products, notifications
