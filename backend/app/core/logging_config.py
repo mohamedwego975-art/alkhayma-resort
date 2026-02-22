@@ -13,7 +13,16 @@ from typing import Any, Dict
 
 # Log directory
 LOG_DIR = Path("logs")
-LOG_DIR.mkdir(exist_ok=True)
+try:
+    LOG_DIR.mkdir(exist_ok=True, mode=0o755)
+except PermissionError:
+    # Fallback to /tmp if logs directory can't be created
+    LOG_DIR = Path("/tmp/logs")
+    LOG_DIR.mkdir(exist_ok=True, mode=0o755)
+except Exception as e:
+    print(f"Warning: Could not create logs directory: {e}")
+    LOG_DIR = Path("/tmp/logs")
+    LOG_DIR.mkdir(exist_ok=True, mode=0o755)
 
 
 class JSONFormatter(logging.Formatter):
@@ -107,34 +116,44 @@ def setup_logging(
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
     
-    # File handler - general logs
-    file_handler = logging.handlers.RotatingFileHandler(
-        LOG_DIR / f"{app_name}.log",
-        maxBytes=10*1024*1024,  # 10MB
-        backupCount=10
-    )
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    # File handler - general logs (with fallback to console if file writing fails)
+    try:
+        file_handler = logging.handlers.RotatingFileHandler(
+            str(LOG_DIR / f"{app_name}.log"),
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=10
+        )
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    except (PermissionError, OSError) as e:
+        console_handler.setFormatter(formatter)
+        print(f"Warning: Could not create file handler: {e}. Using console only.")
     
     # File handler - errors only
-    error_handler = logging.handlers.RotatingFileHandler(
-        LOG_DIR / f"{app_name}_error.log",
-        maxBytes=10*1024*1024,  # 10MB
-        backupCount=10
-    )
-    error_handler.setLevel(logging.ERROR)
-    error_handler.setFormatter(formatter)
-    logger.addHandler(error_handler)
+    try:
+        error_handler = logging.handlers.RotatingFileHandler(
+            str(LOG_DIR / f"{app_name}_error.log"),
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=10
+        )
+        error_handler.setLevel(logging.ERROR)
+        error_handler.setFormatter(formatter)
+        logger.addHandler(error_handler)
+    except (PermissionError, OSError):
+        pass  # Silently skip if we can't create error log file
     
     # File handler - access logs (for API requests)
-    access_handler = logging.handlers.RotatingFileHandler(
-        LOG_DIR / f"{app_name}_access.log",
-        maxBytes=10*1024*1024,  # 10MB
-        backupCount=10
-    )
-    access_handler.setLevel(logging.INFO)
-    access_handler.setFormatter(formatter)
+    try:
+        access_handler = logging.handlers.RotatingFileHandler(
+            str(LOG_DIR / f"{app_name}_access.log"),
+            maxBytes=10*1024*1024,  # 10MB
+            backupCount=10
+        )
+        access_handler.setLevel(logging.INFO)
+        access_handler.setFormatter(formatter)
+    except (PermissionError, OSError):
+        access_handler = logging.StreamHandler(sys.stdout)
     
     # Create access logger
     access_logger = logging.getLogger(f"{app_name}.access")
