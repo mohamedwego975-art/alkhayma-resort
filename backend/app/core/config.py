@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     db_user: str = Field(default="postgres")
     db_pass: str = Field(default="changeme123")
     db_name: str = Field(default="resort_db")
-    db_host: str = Field(default="localhost")
+    db_host: str = Field(default="db")  # Changed from localhost for Docker compatibility
     db_port: int = Field(default=5432)
     
     redis_url: str = Field(default="redis://localhost:6379/0")

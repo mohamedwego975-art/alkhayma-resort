@@ -27,7 +27,7 @@ except Exception as e:
 
 class JSONFormatter(logging.Formatter):
     """JSON formatter for structured logging"""
-    
+
     def format(self, record: logging.LogRecord) -> str:
         log_data = {
             "timestamp": datetime.utcnow().isoformat(),
@@ -38,11 +38,11 @@ class JSONFormatter(logging.Formatter):
             "function": record.funcName,
             "line": record.lineno,
         }
-        
+
         # Add exception info if present
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)
-        
+
         # Add extra fields
         if hasattr(record, "request_id"):
             log_data["request_id"] = record.request_id
@@ -50,22 +50,22 @@ class JSONFormatter(logging.Formatter):
             log_data["user_id"] = record.user_id
         if hasattr(record, "duration_ms"):
             log_data["duration_ms"] = record.duration_ms
-        
+
         return json.dumps(log_data, default=str)
 
 
 class ColoredFormatter(logging.Formatter):
     """Colored formatter for console output"""
-    
+
     COLORS = {
-        'DEBUG': '\033[36m',     # Cyan
-        'INFO': '\033[32m',      # Green
-        'WARNING': '\033[33m',   # Yellow
-        'ERROR': '\033[31m',     # Red
-        'CRITICAL': '\033[35m',  # Magenta
+        "DEBUG": "\033[36m",  # Cyan
+        "INFO": "\033[32m",  # Green
+        "WARNING": "\033[33m",  # Yellow
+        "ERROR": "\033[31m",  # Red
+        "CRITICAL": "\033[35m",  # Magenta
     }
-    RESET = '\033[0m'
-    
+    RESET = "\033[0m"
+
     def format(self, record: logging.LogRecord) -> str:
         log_color = self.COLORS.get(record.levelname, self.RESET)
         record.levelname = f"{log_color}{record.levelname}{self.RESET}"
@@ -73,55 +73,53 @@ class ColoredFormatter(logging.Formatter):
 
 
 def setup_logging(
-    app_name: str = "alkhayma",
-    log_level: str = "INFO",
-    enable_json: bool = False
+    app_name: str = "alkhayma", log_level: str = "INFO", enable_json: bool = False
 ) -> logging.Logger:
     """
     Setup comprehensive logging configuration
-    
+
     Args:
         app_name: Application name for log files
         log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
         enable_json: Enable JSON formatting for production
-        
+
     Returns:
         Configured logger instance
     """
-    
+
     # Create logger
     logger = logging.getLogger(app_name)
     logger.setLevel(getattr(logging, log_level.upper()))
-    
+
     # Remove existing handlers
     logger.handlers = []
-    
+
     # Formatters
     if enable_json:
         formatter = JSONFormatter()
     else:
         formatter = logging.Formatter(
-            '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
+            "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
-    
+
     console_formatter = ColoredFormatter(
-        '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
-    
+
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.DEBUG)
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
-    
+
     # File handler - general logs (with fallback to console if file writing fails)
     try:
         file_handler = logging.handlers.RotatingFileHandler(
             str(LOG_DIR / f"{app_name}.log"),
-            maxBytes=10*1024*1024,  # 10MB
-            backupCount=10
+            maxBytes=10 * 1024 * 1024,  # 10MB
+            backupCount=10,
         )
         file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(formatter)
@@ -129,49 +127,49 @@ def setup_logging(
     except (PermissionError, OSError) as e:
         console_handler.setFormatter(formatter)
         print(f"Warning: Could not create file handler: {e}. Using console only.")
-    
+
     # File handler - errors only
     try:
         error_handler = logging.handlers.RotatingFileHandler(
             str(LOG_DIR / f"{app_name}_error.log"),
-            maxBytes=10*1024*1024,  # 10MB
-            backupCount=10
+            maxBytes=10 * 1024 * 1024,  # 10MB
+            backupCount=10,
         )
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(formatter)
         logger.addHandler(error_handler)
     except (PermissionError, OSError):
         pass  # Silently skip if we can't create error log file
-    
+
     # File handler - access logs (for API requests)
     try:
         access_handler = logging.handlers.RotatingFileHandler(
             str(LOG_DIR / f"{app_name}_access.log"),
-            maxBytes=10*1024*1024,  # 10MB
-            backupCount=10
+            maxBytes=10 * 1024 * 1024,  # 10MB
+            backupCount=10,
         )
         access_handler.setLevel(logging.INFO)
         access_handler.setFormatter(formatter)
     except (PermissionError, OSError):
         access_handler = logging.StreamHandler(sys.stdout)
-    
+
     # Create access logger
     access_logger = logging.getLogger(f"{app_name}.access")
     access_logger.addHandler(access_handler)
-    
+
     return logger
 
 
 # Request logging context
 class RequestContext:
     """Context manager for request logging"""
-    
+
     def __init__(self, logger: logging.Logger, request_id: str, user_id: str = None):
         self.logger = logger
         self.request_id = request_id
         self.user_id = user_id
         self.start_time = None
-    
+
     def __enter__(self):
         self.start_time = datetime.utcnow()
         extra = {"request_id": self.request_id}
@@ -179,21 +177,18 @@ class RequestContext:
             extra["user_id"] = self.user_id
         self.logger.debug("Request started", extra=extra)
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         duration = (datetime.utcnow() - self.start_time).total_seconds() * 1000
-        extra = {
-            "request_id": self.request_id,
-            "duration_ms": round(duration, 2)
-        }
+        extra = {"request_id": self.request_id, "duration_ms": round(duration, 2)}
         if self.user_id:
             extra["user_id"] = self.user_id
-        
+
         if exc_type:
             self.logger.error(
                 f"Request failed after {duration:.2f}ms",
                 extra=extra,
-                exc_info=(exc_type, exc_val, exc_tb)
+                exc_info=(exc_type, exc_val, exc_tb),
             )
         else:
             self.logger.info(f"Request completed in {duration:.2f}ms", extra=extra)
@@ -206,11 +201,11 @@ def log_request(
     status_code: int,
     duration_ms: float,
     user_id: str = None,
-    ip_address: str = None
+    ip_address: str = None,
 ):
     """
     Log API request details
-    
+
     Args:
         logger: Logger instance
         method: HTTP method
@@ -227,12 +222,12 @@ def log_request(
         "status_code": status_code,
         "duration_ms": round(duration_ms, 2),
     }
-    
+
     if user_id:
         log_data["user_id"] = user_id
     if ip_address:
         log_data["ip_address"] = ip_address
-    
+
     if status_code >= 500:
         logger.error(json.dumps(log_data))
     elif status_code >= 400:
@@ -245,11 +240,11 @@ def log_security_event(
     logger: logging.Logger,
     event_type: str,
     details: Dict[str, Any],
-    severity: str = "warning"
+    severity: str = "warning",
 ):
     """
     Log security-related events
-    
+
     Args:
         logger: Logger instance
         event_type: Type of security event (e.g., 'rate_limit_exceeded', 'suspicious_activity')
@@ -260,8 +255,8 @@ def log_security_event(
         "event": "security",
         "event_type": event_type,
         "timestamp": datetime.utcnow().isoformat(),
-        **details
+        **details,
     }
-    
+
     log_func = getattr(logger, severity.lower(), logger.warning)
     log_func(json.dumps(log_data))
