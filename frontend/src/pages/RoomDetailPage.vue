@@ -50,17 +50,28 @@
             </p>
           </div>
 
-          <!-- Reviews -->
+          <!-- Reviews from API -->
           <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-2xl font-bold mb-4">Guest Reviews</h2>
-            <div class="space-y-4">
+            <div v-if="reviewsLoading" class="animate-pulse space-y-4">
               <div v-for="i in 3" :key="i" class="border-b pb-4">
-                <div class="flex items-center gap-2 mb-2">
-                  <span class="text-yellow-500">★★★★★</span>
-                  <span class="font-bold">Guest {{ i }}</span>
-                </div>
-                <p class="text-gray-600">Great room with excellent service!</p>
+                <div class="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                <div class="h-3 bg-gray-200 rounded w-full"></div>
               </div>
+            </div>
+            <div v-else-if="reviews.length > 0" class="space-y-4">
+              <div v-for="review in reviews" :key="review.id" class="border-b pb-4 last:border-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-yellow-500">{{ '★'.repeat(review.rating) }}</span>
+                  <span class="font-bold">{{ review.user_name }}</span>
+                  <span v-if="review.flag" class="text-lg">{{ review.flag }}</span>
+                </div>
+                <p class="text-gray-600">{{ review.comment }}</p>
+                <p class="text-gray-400 text-sm mt-2">{{ new Date(review.created_at).toLocaleDateString() }}</p>
+              </div>
+            </div>
+            <div v-else class="text-gray-500 text-center py-8">
+              <p>No reviews yet. Be the first to review this room!</p>
             </div>
           </div>
         </div>
@@ -68,7 +79,7 @@
         <!-- Right: Sticky Booking Widget -->
         <div class="lg:col-span-1">
           <div class="sticky top-4">
-            <LiveCounter :product-id="room.id" class="mb-4" />
+            <LiveCounter :product-id="String(room.id)" class="mb-4" />
             
             <div class="bg-white rounded-lg shadow-lg p-6">
               <div class="mb-6">
@@ -168,7 +179,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { roomApi, bookingApi, type Room } from '@/api'
+import { roomApi, bookingApi, reviewApi, type Room, type Review } from '@/api'
 import { useAuthStore } from '@/stores/auth'
 import LiveCounter from '@/components/smart/LiveCounter.vue'
 import SmartSuggestModal from '@/components/smart/SmartSuggestModal.vue'
@@ -178,6 +189,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const room = ref<Room | null>(null)
+const reviews = ref<Review[]>([])
+const reviewsLoading = ref(false)
 const loading = ref(true)
 const checkIn = ref('')
 const checkOut = ref('')
@@ -212,10 +225,27 @@ async function fetchRoom() {
     const response = await roomApi.getById(Number(route.params.slug))
     room.value = response.data
     guests.value = 1
+    // Fetch reviews after room is loaded
+    await fetchReviews()
   } catch (e) {
     console.error('Failed to fetch room:', e)
   } finally {
     loading.value = false
+  }
+}
+
+async function fetchReviews() {
+  if (!room.value) return
+  reviewsLoading.value = true
+  try {
+    const response = await reviewApi.getByProductId(room.value.id)
+    reviews.value = response.data.filter(r => r.is_approved)
+  } catch (e) {
+    console.error('Failed to fetch reviews:', e)
+    // Fallback to empty array
+    reviews.value = []
+  } finally {
+    reviewsLoading.value = false
   }
 }
 

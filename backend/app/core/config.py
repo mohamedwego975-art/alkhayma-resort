@@ -34,8 +34,15 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def database_url(self) -> str:
-        """Assemble database URL from parts."""
+        """Assemble database URL from parts - supports both PostgreSQL and SQLite for development."""
+        # Use SQLite for quick development if USE_SQLITE is set
+        if getattr(self, 'use_sqlite', False):
+            return "sqlite+aiosqlite:///./alkhayma_dev.db"
         return f"postgresql+asyncpg://{self.db_user}:{self.db_pass}@{self.db_host}:{self.db_port}/{self.db_name}"
+    
+    # Development settings
+    use_sqlite: bool = Field(default=False)
+    log_level: str = Field(default="DEBUG")
     
     @computed_field
     @property

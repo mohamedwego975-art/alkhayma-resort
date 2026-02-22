@@ -39,21 +39,21 @@ const router = createRouter({
       component: () => import('@/pages/LocationPage.vue')
     },
     {
-      path: '/booking/:productId?',
+      path: '/booking',
       name: 'booking',
-      component: () => import('@/views/BookingView.vue'),
+      component: () => import('@/pages/BookingPage.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/booking/confirm',
-      name: 'booking-confirm',
-      component: () => import('@/views/BookingView.vue'),
+      path: '/booking-confirmation/:id',
+      name: 'booking-confirmation',
+      component: () => import('@/pages/ConfirmationPage.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/account',
       name: 'account',
-      component: () => import('@/views/AccountView.vue'),
+      component: () => import('@/pages/AccountPage.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -66,6 +66,46 @@ const router = createRouter({
       path: '/faq',
       name: 'faq',
       component: () => import('@/pages/FAQPage.vue')
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/pages/AboutPage.vue')
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('@/pages/ContactPage.vue')
+    },
+    {
+      path: '/restaurant',
+      name: 'restaurant',
+      component: () => import('@/pages/RestaurantPage.vue')
+    },
+    {
+      path: '/cafe',
+      name: 'cafe',
+      component: () => import('@/pages/CafePage.vue')
+    },
+    {
+      path: '/activities',
+      name: 'activities',
+      component: () => import('@/pages/ActivitiesPage.vue')
+    },
+    {
+      path: '/events',
+      name: 'events',
+      component: () => import('@/pages/EventsPage.vue')
+    },
+    {
+      path: '/gallery',
+      name: 'gallery',
+      component: () => import('@/pages/GalleryPage.vue')
+    },
+    {
+      path: '/team',
+      name: 'team',
+      component: () => import('@/pages/TeamPage.vue')
     },
     {
       path: '/admin',

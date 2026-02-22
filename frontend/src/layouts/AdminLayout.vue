@@ -21,15 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import AdminSidebar from './AdminSidebar.vue'
-import AdminHeader from './AdminHeader.vue'
+import { ref } from "vue";
+import AdminSidebar from "@/components/AdminSidebar.vue";
+import AdminHeader from "@/components/AdminHeader.vue";
 
-const isSidebarCollapsed = ref(false)
+const isSidebarCollapsed = ref(false);
 
 const toggleSidebar = () => {
-  isSidebarCollapsed.value = !isSidebarCollapsed.value
-}
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+};
 </script>
 
 <style scoped>
@@ -72,7 +72,7 @@ const toggleSidebar = () => {
   .main-content {
     margin-left: 0;
   }
-  
+
   .main-content.sidebar-collapsed {
     margin-left: 0;
   }

@@ -58,9 +58,6 @@ logs/
 backend.log
 ai-service.log
 
-# Docker
-.dockerignore
-
 # IDE
 .vscode/
 .idea/

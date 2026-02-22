@@ -1,4 +1,5 @@
 export * from './auth'
 export * from './bookings'
 export * from './rooms'
+export * from './reviews'
 export { default as apiClient } from './client'

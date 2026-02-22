@@ -7,12 +7,33 @@ Full-stack resort booking platform with AI chatbot and automation workflows.
 ```
 alkhayma-resort/
 ├── backend/           # FastAPI + SQLAlchemy + PostgreSQL
+│   ├── app/
+│   │   ├── api/           # API endpoints (consolidated in endpoints/)
+│   │   ├── core/          # Database, config, security, deps
+│   │   ├── models/        # SQLAlchemy models
+│   │   ├── repositories/  # Data access layer
+│   │   ├── schemas/       # Pydantic schemas
+│   │   └── services/      # Business logic
+│   └── alembic/         # Database migrations
 ├── frontend/          # Vue 3 + TypeScript + Tailwind
+│   ├── src/
+│   │   ├── components/    # Reusable components
+│   │   ├── pages/         # Page components
+│   │   ├── layouts/       # Layout components
+│   │   ├── stores/        # Pinia stores
+│   │   ├── api/           # API client
+│   │   └── router/        # Vue Router config
+│   └── public/          # Static assets
 ├── ai-service/        # LangChain + GPT Chatbot
 ├── n8n-workflows/     # WhatsApp + Email Automation
 ├── n8n-setup/         # Professional N8N Docker Setup
+├── docs/              # Documentation (organized by topic)
+│   ├── backend/         # Backend documentation
+│   ├── frontend/        # Frontend documentation
+│   ├── database/        # Database documentation
+│   └── guides/          # Guides and quick starts
 ├── monitoring/        # Prometheus + Grafana (TODO)
-└── nginx/            # Production Nginx Config
+└── nginx/             # Production Nginx Config
 ```
 
 ## 🚀 Quick Start
@@ -41,6 +62,13 @@ cp .env.prod .env
 # Deploy
 ./deploy.sh
 ```
+
+## 📚 Documentation
+
+- [Guides & Quick Starts](docs/guides/)
+- [Frontend Docs](docs/frontend/)
+- [Backend Docs](docs/backend/)
+- [Database Docs](docs/database/)
 
 ## 📊 Current Status
 

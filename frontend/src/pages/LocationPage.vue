@@ -3,20 +3,15 @@
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
-        <h1 class="hero-title">{{ t('location.title') }}</h1>
-        <p class="hero-subtitle">{{ t('location.subtitle') }}</p>
+        <h1 class="hero-title">{{ t("location.title") }}</h1>
+        <p class="hero-subtitle">{{ t("location.subtitle") }}</p>
       </div>
     </section>
 
     <!-- Map Section -->
     <section class="map-section">
       <div class="container">
-        <ResortMap
-          :center="resortLocation"
-          :zoom="16"
-          :height="'500px'"
-          :markers="markers"
-        />
+        <ResortMap :center="resortLocation" :zoom="16" :height="'500px'" :markers="markers" />
       </div>
     </section>
 
@@ -27,54 +22,50 @@
           <!-- Address -->
           <div class="detail-card">
             <div class="detail-icon">📍</div>
-            <h3 class="detail-title">{{ t('location.address') }}</h3>
+            <h3 class="detail-title">{{ t("location.address") }}</h3>
             <p class="detail-content">
-              {{ t('location.address_line1') }}<br>
-              {{ t('location.address_line2') }}<br>
-              {{ t('location.address_city') }}
+              {{ t("location.address_line1") }}<br />
+              {{ t("location.address_line2") }}<br />
+              {{ t("location.address_city") }}
             </p>
           </div>
 
           <!-- Contact -->
           <div class="detail-card">
             <div class="detail-icon">📞</div>
-            <h3 class="detail-title">{{ t('location.contact') }}</h3>
+            <h3 class="detail-title">{{ t("location.contact") }}</h3>
             <p class="detail-content">
-              {{ t('location.phone') }}<br>
-              {{ t('location.email') }}
+              {{ t("location.phone") }}<br />
+              {{ t("location.email") }}
             </p>
           </div>
 
           <!-- Transportation -->
           <div class="detail-card">
             <div class="detail-icon">🚗</div>
-            <h3 class="detail-title">{{ t('location.transportation') }}</h3>
+            <h3 class="detail-title">{{ t("location.transportation") }}</h3>
             <p class="detail-content">
-              {{ t('location.airport_distance') }}<br>
-              {{ t('location.taxi_available') }}
+              {{ t("location.airport_distance") }}<br />
+              {{ t("location.taxi_available") }}
             </p>
           </div>
 
           <!-- Nearby Attractions -->
           <div class="detail-card">
             <div class="detail-icon">🎯</div>
-            <h3 class="detail-title">{{ t('location.nearby') }}</h3>
+            <h3 class="detail-title">{{ t("location.nearby") }}</h3>
             <p class="detail-content">
-              {{ t('location.attraction1') }}<br>
-              {{ t('location.attraction2') }}<br>
-              {{ t('location.attraction3') }}
+              {{ t("location.attraction1") }}<br />
+              {{ t("location.attraction2") }}<br />
+              {{ t("location.attraction3") }}
             </p>
           </div>
         </div>
 
         <!-- CTA -->
         <div class="cta-section">
-          <a
-            :href="directionsLink"
-            target="_blank"
-            class="cta-button"
-          >
-            {{ t('location.get_directions') }}
+          <a :href="directionsLink" target="_blank" class="cta-button">
+            {{ t("location.get_directions") }}
           </a>
         </div>
       </div>
@@ -83,13 +74,9 @@
     <!-- Nearby Places -->
     <section class="nearby-section">
       <div class="container">
-        <h2 class="section-title">{{ t('location.nearby_places') }}</h2>
+        <h2 class="section-title">{{ t("location.nearby_places") }}</h2>
         <div class="nearby-grid">
-          <div
-            v-for="place in nearbyPlaces"
-            :key="place.name"
-            class="nearby-card"
-          >
+          <div v-for="place in nearbyPlaces" :key="place.name" class="nearby-card">
             <div class="nearby-icon">{{ place.icon }}</div>
             <h4 class="nearby-name">{{ place.name }}</h4>
             <p class="nearby-distance">{{ place.distance }}</p>
@@ -102,57 +89,57 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import ResortMap from '@/components/ResortMap.vue'
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+import ResortMap from "@/components/ResortMap.vue";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Resort location - Alexandria, Egypt (example coordinates)
 const resortLocation = {
   lat: 31.2001,
-  lng: 29.9187
-}
-
-const markers = [
-  {
-    position: resortLocation,
-    title: t('location.resort_name', 'AlKhayma Beach Resort'),
-    description: t('location.resort_description', 'Luxury beach resort in Alexandria'),
-    link: directionsLink.value
-  }
-]
+  lng: 29.9187,
+};
 
 const directionsLink = computed(() => {
-  return `https://www.google.com/maps/dir/?api=1&destination=${resortLocation.lat},${resortLocation.lng}`
-})
+  return `https://www.google.com/maps/dir/?api=1&destination=${resortLocation.lat},${resortLocation.lng}`;
+});
+
+const markers = computed(() => [
+  {
+    position: resortLocation,
+    title: t("location.resort_name", "AlKhayma Beach Resort"),
+    description: t("location.resort_description", "Luxury beach resort in Alexandria"),
+    link: directionsLink.value,
+  },
+]);
 
 const nearbyPlaces = [
   {
-    icon: '🏛️',
-    name: t('location.place_library', 'Library of Alexandria'),
-    distance: t('location.distance_15min', '15 min drive'),
-    description: t('location.library_desc', 'Ancient library and modern cultural center')
+    icon: "🏛️",
+    name: t("location.place_library", "Library of Alexandria"),
+    distance: t("location.distance_15min", "15 min drive"),
+    description: t("location.library_desc", "Ancient library and modern cultural center"),
   },
   {
-    icon: '🏰',
-    name: t('location.place_fort', 'Qaitbay Citadel'),
-    distance: t('location.distance_20min', '20 min drive'),
-    description: t('location.fort_desc', '15th-century defensive fortress')
+    icon: "🏰",
+    name: t("location.place_fort", "Qaitbay Citadel"),
+    distance: t("location.distance_20min", "20 min drive"),
+    description: t("location.fort_desc", "15th-century defensive fortress"),
   },
   {
-    icon: '🌊',
-    name: t('location.place_corniche', 'Corniche'),
-    distance: t('location.distance_5min', '5 min walk'),
-    description: t('location.corniche_desc', 'Scenic waterfront promenade')
+    icon: "🌊",
+    name: t("location.place_corniche", "Corniche"),
+    distance: t("location.distance_5min", "5 min walk"),
+    description: t("location.corniche_desc", "Scenic waterfront promenade"),
   },
   {
-    icon: '🛍️',
-    name: t('location.place_market', 'Souk El Gomaa'),
-    distance: t('location.distance_25min', '25 min drive'),
-    description: t('location.market_desc', 'Traditional Friday market')
-  }
-]
+    icon: "🛍️",
+    name: t("location.place_market", "Souk El Gomaa"),
+    distance: t("location.distance_25min", "25 min drive"),
+    description: t("location.market_desc", "Traditional Friday market"),
+  },
+];
 </script>
 
 <style scoped>
@@ -240,7 +227,9 @@ const nearbyPlaces = [
   border-radius: 8px;
   font-weight: 600;
   font-size: 1.1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .cta-button:hover {
@@ -308,7 +297,7 @@ const nearbyPlaces = [
   .hero-title {
     font-size: 2rem;
   }
-  
+
   .details-grid {
     grid-template-columns: 1fr;
   }

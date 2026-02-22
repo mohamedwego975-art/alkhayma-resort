@@ -25,7 +25,7 @@
       <!-- Live Counter -->
       <LiveCounter
         v-if="room.id"
-        :product-id="room.id"
+        :product-id="String(room.id)"
         class="absolute bottom-4 left-4 glass-dark px-3 py-1 rounded-full text-white text-sm"
       />
     </div>

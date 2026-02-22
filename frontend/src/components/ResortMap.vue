@@ -9,7 +9,7 @@
       style="width: 100%; height: 100%"
     >
       <Marker
-        v-for="(marker, index) in markers"
+        v-for="(marker, index) in props.markers.length > 0 ? props.markers : defaultMarkers"
         :key="index"
         :options="marker"
         @click="onMarkerClick(marker)"
@@ -28,7 +28,7 @@
             target="_blank"
             class="info-link"
           >
-            {{ t('map.get_directions') }}
+            {{ t("map.get_directions") }}
           </a>
         </div>
       </InfoWindow>
@@ -37,42 +37,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { GoogleMap, Marker, InfoWindow } from 'vue3-google-map'
-import { useI18n } from 'vue-i18n'
+import { ref, computed } from "vue";
+import { GoogleMap, Marker, InfoWindow } from "vue3-google-map";
+import { useI18n } from "vue-i18n";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 interface MapMarker {
-  position: { lat: number; lng: number }
-  title: string
-  description?: string
-  link?: string
-  icon?: string
+  position: { lat: number; lng: number };
+  title: string;
+  description?: string;
+  link?: string;
+  icon?: string;
 }
 
 interface Props {
-  center?: { lat: number; lng: number }
-  zoom?: number
-  markers?: MapMarker[]
-  mapTypeId?: string
-  height?: string
+  center?: { lat: number; lng: number };
+  zoom?: number;
+  markers?: MapMarker[];
+  mapTypeId?: string;
+  height?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   center: () => ({ lat: 31.2001, lng: 29.9187 }), // Alexandria, Egypt default
   zoom: 15,
   markers: () => [],
-  mapTypeId: 'roadmap',
-  height: '400px'
-})
+  mapTypeId: "roadmap",
+  height: "400px",
+});
 
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-const selectedMarker = ref<MapMarker | null>(null)
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+const selectedMarker = ref<MapMarker | null>(null);
 
-const center = computed(() => props.center)
-const zoom = computed(() => props.zoom)
-const mapTypeId = computed(() => props.mapTypeId)
+const center = computed(() => props.center);
+const zoom = computed(() => props.zoom);
+const mapTypeId = computed(() => props.mapTypeId);
 
 const mapOptions = {
   zoomControl: true,
@@ -83,28 +83,30 @@ const mapOptions = {
   fullscreenControl: true,
   styles: [
     {
-      featureType: 'poi',
-      elementType: 'labels',
-      stylers: [{ visibility: 'off' }]
-    }
-  ]
-}
+      featureType: "poi",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
+    },
+  ],
+};
 
 const onMarkerClick = (marker: MapMarker) => {
-  selectedMarker.value = marker
-}
+  selectedMarker.value = marker;
+};
 
 const defaultMarkers = computed<MapMarker[]>(() => {
-  if (props.markers.length > 0) return props.markers
-  
+  if (props.markers.length > 0) return props.markers;
+
   // Default resort marker
-  return [{
-    position: props.center,
-    title: t('map.resort_title', 'AlKhayma Beach Resort'),
-    description: t('map.resort_description', 'Your luxury beach getaway in Alexandria'),
-    link: `https://www.google.com/maps/dir/?api=1&destination=${props.center.lat},${props.center.lng}`
-  }]
-})
+  return [
+    {
+      position: props.center,
+      title: t("map.resort_title", "AlKhayma Beach Resort"),
+      description: t("map.resort_description", "Your luxury beach getaway in Alexandria"),
+      link: `https://www.google.com/maps/dir/?api=1&destination=${props.center.lat},${props.center.lng}`,
+    },
+  ];
+});
 </script>
 
 <style scoped>
