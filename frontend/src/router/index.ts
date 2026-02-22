@@ -63,6 +63,11 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
+      path: '/faq',
+      name: 'faq',
+      component: () => import('@/pages/FAQPage.vue')
+    },
+    {
       path: '/admin',
       component: () => import('@/layouts/AdminLayout.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
