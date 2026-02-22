@@ -1,14 +1,16 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Optional
 from app.core.database import get_db
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, require_role
 from app.core.exceptions import NotFoundException, ValidationException
 from app.repositories import BookingRepository, RoomRepository
-from app.schemas.booking import BookingCreate, BookingResponse
-from app.models.user import User
+from app.schemas.booking import BookingCreate, BookingResponse, BookingStatusUpdate
+from app.models.user import User, UserRole
 from app.models.booking import BookingStatus
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
 
@@ -69,4 +71,38 @@ async def get_booking(
     booking = await repo.get(booking_id)
     if not booking:
         raise NotFoundException("Booking", booking_id)
+    return booking
+
+
+@router.get("/admin/all", response_model=List[BookingResponse])
+async def admin_list_bookings(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=200),
+    current_user: User = Depends(require_role(UserRole.ADMIN, UserRole.STAFF)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Admin: List all bookings across all users"""
+    repo = BookingRepository(db)
+    bookings = await repo.get_all(skip=skip, limit=limit)
+    logger.info(f"Admin {current_user.email} fetched all bookings (count={len(bookings)})")
+    return bookings
+
+
+@router.patch("/admin/{booking_id}/status", response_model=BookingResponse)
+async def admin_update_booking_status(
+    booking_id: int,
+    status_update: "BookingStatusUpdate",
+    current_user: User = Depends(require_role(UserRole.ADMIN, UserRole.STAFF)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Admin: Update a booking's status"""
+    try:
+        new_status = BookingStatus(status_update.status)
+    except ValueError:
+        raise ValidationException(f"Invalid status: {status_update.status}")
+    repo = BookingRepository(db)
+    booking = await repo.update_status(booking_id, new_status)
+    if not booking:
+        raise NotFoundException("Booking", booking_id)
+    logger.info(f"Admin {current_user.email} updated booking {booking_id} status to {new_status}")
     return booking

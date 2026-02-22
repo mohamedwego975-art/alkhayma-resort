@@ -23,17 +23,17 @@ test_endpoint() {
     local name="$1"
     local url="$2"
     local expected="$3"
-    
+
     echo -n "Testing: $name ... "
-    
+
     response=$(curl -s "$url" 2>/dev/null)
-    
+
     if [ -z "$response" ]; then
         echo -e "${RED}❌ FAILED${NC} (No response)"
         ((FAILED++))
         return 1
     fi
-    
+
     if [ -n "$expected" ]; then
         if echo "$response" | grep -q "$expected"; then
             echo -e "${GREEN}✅ PASSED${NC}"
@@ -53,7 +53,7 @@ test_endpoint() {
 
 # Check Backend
 echo "1️⃣ Backend Health Check"
-if ! curl -s "$BASE_URL/health" > /dev/null 2>&1; then
+if ! curl -s "$BASE_URL/api/health" > /dev/null 2>&1; then
     echo -e "${RED}❌ Backend not running on port 8000${NC}"
     echo ""
     echo "Start backend:"
@@ -82,10 +82,10 @@ echo ""
 echo "3️⃣ API Endpoint Tests"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-test_endpoint "Health endpoint" "$BASE_URL/health" "status"
-test_endpoint "Get all rooms" "$BASE_URL/api/products?type=room" "room_number"
-test_endpoint "Get beach products" "$BASE_URL/api/products?type=beach" "beach"
-test_endpoint "Get water activities" "$BASE_URL/api/products?type=water_activity" "water_activity"
+test_endpoint "Health endpoint" "$BASE_URL/api/health" "status"
+test_endpoint "Get all rooms" "$BASE_URL/api/rooms" "room_number"
+test_endpoint "Get beach products" "$BASE_URL/api/products?product_type=beach" "beach"
+test_endpoint "Get water activities" "$BASE_URL/api/products?product_type=water_activity" "water_activity"
 
 echo ""
 
@@ -95,7 +95,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/api/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@alkhayma.com","password":"password123"}' 2>/dev/null)
+  -d '{"email":"admin@alkhayma.com","password":"admin123"}' 2>/dev/null)
 
 if echo "$LOGIN_RESPONSE" | grep -q "access_token"; then
     echo -e "Admin login: ${GREEN}✅ PASSED${NC}"
@@ -113,7 +113,7 @@ echo ""
 echo "5️⃣ Data Validation"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ROOMS=$(curl -s "$BASE_URL/api/products?type=room" 2>/dev/null)
+ROOMS=$(curl -s "$BASE_URL/api/rooms" 2>/dev/null)
 ROOM_COUNT=$(echo "$ROOMS" | python3 -c "import sys, json; print(len(json.load(sys.stdin)))" 2>/dev/null)
 
 if [ "$ROOM_COUNT" = "6" ]; then
@@ -124,7 +124,7 @@ else
     ((FAILED++))
 fi
 
-PRODUCTS=$(curl -s "$BASE_URL/api/products?type=beach" 2>/dev/null)
+PRODUCTS=$(curl -s "$BASE_URL/api/products?product_type=beach" 2>/dev/null)
 PRODUCT_COUNT=$(echo "$PRODUCTS" | python3 -c "import sys, json; print(len(json.load(sys.stdin)))" 2>/dev/null)
 
 if [ "$PRODUCT_COUNT" = "2" ]; then
@@ -141,11 +141,11 @@ echo ""
 if [ "$FRONTEND_RUNNING" = true ]; then
     echo "6️⃣ Frontend Integration"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
+
     test_endpoint "Homepage loads" "$FRONTEND_URL" "الخيمة"
     test_endpoint "Rooms page exists" "$FRONTEND_URL/rooms"
     test_endpoint "Beach page exists" "$FRONTEND_URL/beach"
-    
+
     echo ""
 fi
 

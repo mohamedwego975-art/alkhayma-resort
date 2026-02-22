@@ -1,5 +1,4 @@
-from typing import List
-from datetime import date
+from typing import List, Optional
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.base import BaseRepository
@@ -25,3 +24,18 @@ class BookingRepository(BaseRepository[Booking]):
             )
         )
         return list(result.scalars().all())
+
+    async def get_all(self, skip: int = 0, limit: int = 100) -> List[Booking]:
+        result = await self.db.execute(
+            select(Booking).order_by(Booking.created_at.desc()).offset(skip).limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def update_status(self, booking_id: int, status: BookingStatus) -> Optional[Booking]:
+        booking = await self.get(booking_id)
+        if not booking:
+            return None
+        booking.status = status
+        await self.db.commit()
+        await self.db.refresh(booking)
+        return booking

@@ -416,12 +416,12 @@ const fetchData = async () => {
   loading.value = true;
   try {
     // Fetch rooms
-    const roomsResponse = await api.get("/api/products?type=room");
-    rooms.value = roomsResponse.data.map((room: any) => ({
+    const roomsResponse = await api.get("/rooms");
+    rooms.value = (roomsResponse.data || []).map((room: any) => ({
       id: room.id,
       room_number: room.room_number || room.name,
       room_type: room.room_type || "standard",
-      status: room.is_active ? "available" : "occupied",
+      status: room.status || (room.is_active ? "available" : "occupied"),
       price_per_night: room.price_per_night || room.base_price,
       capacity: room.capacity,
       rating: room.rating,

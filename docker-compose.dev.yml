@@ -2,17 +2,23 @@ version: '3.8'
 
 services:
   backend:
-    build: 
+    build:
       context: ./backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/code
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:changeme123@db:5432/resort_db
-      - REDIS_URL=redis://redis:6379
+      - DB_USER=resort_user
+      - DB_PASS=strong_password_123!
+      - DB_NAME=resort_db
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/0
       - ENVIRONMENT=development
       - DEBUG=true
+      - SECRET_KEY=dev-secret-key-change-in-production-64-chars-long-min
+      - USE_SQLITE=false
     depends_on:
       - db
       - redis
@@ -24,14 +30,19 @@ services:
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: resort_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: changeme123
+      POSTGRES_USER: resort_user
+      POSTGRES_PASSWORD: strong_password_123!
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - resort-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U resort_user -d resort_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -41,6 +52,11 @@ services:
       - redis_data:/data
     networks:
       - resort-net
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   frontend:
     build:
@@ -68,6 +84,7 @@ services:
 volumes:
   postgres_data:
   redis_data:
+
 
 networks:
   resort-net:

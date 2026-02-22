@@ -51,4 +51,12 @@ export const bookingApi = {
 
   getById: (id: number) =>
     apiClient.get<Booking>(`/bookings/${id}`),
+
+  // Admin endpoints
+  adminGetAll: (skip = 0, limit = 100) =>
+    apiClient.get<Booking[]>('/bookings/admin/all', { params: { skip, limit } }),
+
+  adminUpdateStatus: (id: number, status: string) =>
+    apiClient.patch<Booking>(`/bookings/admin/${id}/status`, { status }),
 }
+

@@ -2,8 +2,8 @@
   <div class="dashboard-overview">
     <!-- Page Title -->
     <div class="page-header">
-      <h1>{{ $t('admin.dashboard') }}</h1>
-      <p class="subtitle">{{ $t('admin.welcome') }}</p>
+      <h1>{{ $t("admin.dashboard") }}</h1>
+      <p class="subtitle">{{ $t("admin.welcome") }}</p>
     </div>
 
     <!-- Stats Cards -->
@@ -23,7 +23,7 @@
     <div class="charts-row">
       <!-- Revenue Chart -->
       <div class="chart-card">
-        <h3>{{ $t('analytics.revenue') }}</h3>
+        <h3>{{ $t("analytics.revenue") }}</h3>
         <div class="chart-placeholder">
           <div class="bar-chart">
             <div
@@ -40,19 +40,19 @@
 
       <!-- Occupancy Chart -->
       <div class="chart-card">
-        <h3>{{ $t('analytics.occupancy') }}</h3>
+        <h3>{{ $t("analytics.occupancy") }}</h3>
         <div class="occupancy-stats">
           <div class="occupancy-circle">
             <div class="circle-value">{{ occupancyRate }}%</div>
-            <div class="circle-label">{{ $t('analytics.current') }}</div>
+            <div class="circle-label">{{ $t("analytics.current") }}</div>
           </div>
           <div class="occupancy-details">
             <div class="detail-item">
-              <span class="label">{{ $t('analytics.occupied') }}:</span>
+              <span class="label">{{ $t("analytics.occupied") }}:</span>
               <span class="value">{{ occupiedRooms }}</span>
             </div>
             <div class="detail-item">
-              <span class="label">{{ $t('analytics.available') }}:</span>
+              <span class="label">{{ $t("analytics.available") }}:</span>
               <span class="value">{{ availableRooms }}</span>
             </div>
           </div>
@@ -65,17 +65,13 @@
       <!-- Recent Bookings -->
       <div class="panel">
         <div class="panel-header">
-          <h3>{{ $t('admin.recentBookings') }}</h3>
+          <h3>{{ $t("admin.recentBookings") }}</h3>
           <router-link to="/admin/bookings" class="view-all">
-            {{ $t('admin.viewAll') }} →
+            {{ $t("admin.viewAll") }} →
           </router-link>
         </div>
         <div class="bookings-list">
-          <div
-            v-for="booking in recentBookings"
-            :key="booking.id"
-            class="booking-item"
-          >
+          <div v-for="booking in recentBookings" :key="booking.id" class="booking-item">
             <div class="booking-info">
               <span class="guest-name">{{ booking.guest_name }}</span>
               <span class="booking-details">
@@ -92,20 +88,16 @@
       <!-- Popular Products -->
       <div class="panel">
         <div class="panel-header">
-          <h3>{{ $t('admin.popularProducts') }}</h3>
+          <h3>{{ $t("admin.popularProducts") }}</h3>
           <router-link to="/admin/products" class="view-all">
-            {{ $t('admin.viewAll') }} →
+            {{ $t("admin.viewAll") }} →
           </router-link>
         </div>
         <div class="products-list">
-          <div
-            v-for="(product, index) in popularProducts"
-            :key="product.id"
-            class="product-item"
-          >
+          <div v-for="(product, index) in popularProducts" :key="product.id" class="product-item">
             <span class="rank">#{{ index + 1 }}</span>
             <span class="product-name">{{ product.name }}</span>
-            <span class="product-bookings">{{ product.bookings }} {{ $t('admin.bookings') }}</span>
+            <span class="product-bookings">{{ product.bookings }} {{ $t("admin.bookings") }}</span>
           </div>
         </div>
       </div>
@@ -113,14 +105,9 @@
 
     <!-- Alerts & Notifications -->
     <div class="alerts-panel" v-if="alerts.length > 0">
-      <h3>{{ $t('admin.alerts') }}</h3>
+      <h3>{{ $t("admin.alerts") }}</h3>
       <div class="alerts-list">
-        <div
-          v-for="alert in alerts"
-          :key="alert.id"
-          class="alert-item"
-          :class="alert.type"
-        >
+        <div v-for="alert in alerts" :key="alert.id" class="alert-item" :class="alert.type">
           <span class="alert-icon">{{ alert.icon }}</span>
           <span class="alert-message">{{ alert.message }}</span>
           <button class="alert-action" @click="handleAlert(alert)">
@@ -133,86 +120,169 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import StatCard from '@/components/admin/StatCard.vue'
+import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
+import { bookingApi } from "../../api/bookings";
+import { roomApi } from "../../api/rooms";
+import { authApi } from "../../api/auth";
+import StatCard from "@/components/admin/StatCard.vue";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Stats data
 const stats = ref([
-  { key: 'revenue', title: t('analytics.todayRevenue'), value: '$1,240', change: '+12%', icon: '💰', trend: 'up' as const },
-  { key: 'bookings', title: t('analytics.activeBookings'), value: '23', change: '+5%', icon: '📅', trend: 'up' as const },
-  { key: 'guests', title: t('analytics.totalGuests'), value: '45', change: '-2%', icon: '👥', trend: 'down' as const },
-  { key: 'occupancy', title: t('analytics.occupancyRate'), value: '78%', change: '+8%', icon: '🏨', trend: 'up' as const },
-])
+  {
+    key: "revenue",
+    title: t("analytics.todayRevenue"),
+    value: "$—",
+    change: "+0%",
+    icon: "💰",
+    trend: "up" as const,
+  },
+  {
+    key: "bookings",
+    title: t("analytics.activeBookings"),
+    value: "—",
+    change: "+0%",
+    icon: "📅",
+    trend: "up" as const,
+  },
+  {
+    key: "guests",
+    title: t("analytics.totalGuests"),
+    value: "—",
+    change: "+0%",
+    icon: "👥",
+    trend: "down" as const,
+  },
+  {
+    key: "occupancy",
+    title: t("analytics.occupancyRate"),
+    value: "—%",
+    change: "+0%",
+    icon: "🏨",
+    trend: "up" as const,
+  },
+]);
 
 // Revenue chart data
 const revenueData = ref([
-  { label: 'Mon', value: 45 },
-  { label: 'Tue', value: 60 },
-  { label: 'Wed', value: 75 },
-  { label: 'Thu', value: 55 },
-  { label: 'Fri', value: 80 },
-  { label: 'Sat', value: 95 },
-  { label: 'Sun', value: 70 },
-])
+  { label: "Mon", value: 45 },
+  { label: "Tue", value: 60 },
+  { label: "Wed", value: 75 },
+  { label: "Thu", value: 55 },
+  { label: "Fri", value: 80 },
+  { label: "Sat", value: 95 },
+  { label: "Sun", value: 70 },
+]);
 
 // Occupancy data
-const occupancyRate = ref(78)
-const occupiedRooms = ref(18)
-const availableRooms = ref(5)
+const occupancyRate = ref(0);
+const occupiedRooms = ref(0);
+const availableRooms = ref(0);
 
 // Recent bookings
-const recentBookings = ref([
-  { id: 1, guest_name: 'John Smith', room_type: 'Deluxe Suite', check_in: '2024-02-25', status: 'confirmed' },
-  { id: 2, guest_name: 'Sarah Johnson', room_type: 'Standard Room', check_in: '2024-02-26', status: 'pending' },
-  { id: 3, guest_name: 'Michael Brown', room_type: 'VIP Beach', check_in: '2024-02-27', status: 'confirmed' },
-  { id: 4, guest_name: 'Emily Davis', room_type: 'Family Room', check_in: '2024-02-28', status: 'confirmed' },
-])
+const recentBookings = ref<any[]>([]);
 
 // Popular products
 const popularProducts = ref([
-  { id: 1, name: 'VIP Beach Access', bookings: 45 },
-  { id: 2, name: 'Deluxe Room', bookings: 38 },
-  { id: 3, name: 'Spa Package', bookings: 32 },
-  { id: 4, name: 'Water Activities', bookings: 28 },
-])
+  { id: 1, name: "VIP Beach Access", bookings: 45 },
+  { id: 2, name: "Deluxe Room", bookings: 38 },
+  { id: 3, name: "Spa Package", bookings: 32 },
+  { id: 4, name: "Water Activities", bookings: 28 },
+]);
 
 // Alerts
-const alerts = ref([
-  { id: 1, type: 'warning', icon: '⚠️', message: '3 bookings pending confirmation', action: 'Review', link: '/admin/bookings' },
-  { id: 2, type: 'info', icon: 'ℹ️', message: 'Maintenance scheduled for Room 101', action: 'View', link: '/admin/rooms' },
-])
+const alerts = ref<any[]>([]);
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
+  return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
 
 const handleAlert = (alert: any) => {
   // Handle alert action
-  console.log('Handling alert:', alert)
-}
+  console.log("Handling alert:", alert);
+};
 
-onMounted(async () => {
-  // Fetch real analytics data
+async function fetchDashboardData() {
   try {
-    const response = await fetch('http://localhost:8000/api/analytics/dashboard')
-    if (response.ok) {
-      const data = await response.json()
-      // Update stats with real data
-      if (stats.value[0]) stats.value[0].value = `$${data.today_revenue}`
-      if (stats.value[1]) stats.value[1].value = String(data.active_bookings)
-      if (stats.value[2]) stats.value[2].value = String(data.total_customers)
-      if (stats.value[3]) stats.value[3].value = `${data.occupancy_rate}%`
-      occupancyRate.value = data.occupancy_rate
-      occupiedRooms.value = data.occupied_rooms
-      availableRooms.value = data.available_rooms
+    // Fetch bookings
+    const bookingsResponse = await bookingApi.adminGetAll(0, 100);
+    const allBookings = bookingsResponse.data;
+
+    // Fetch rooms
+    const roomsResponse = await roomApi.getAll();
+    const allRooms = roomsResponse.data;
+
+    // Fetch users
+    const usersResponse = await authApi.adminGetAllUsers(0, 100);
+    const allUsers = usersResponse.data;
+
+    // Calculate statistics
+    const confirmedBookings = allBookings.filter(
+      (b) => b.status === "confirmed" || b.status === "checked_in",
+    ).length;
+    const occupiedRoomsCount = allRooms.filter((r) => r.status === "occupied").length;
+    const availableRoomsCount = allRooms.filter((r) => r.status === "available").length;
+    const totalRooms = allRooms.length || 1;
+
+    const occupancy = Math.round((occupiedRoomsCount / totalRooms) * 100);
+    const totalRevenue = allBookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
+
+    // Update stats
+    if (stats.value[0]) stats.value[0].value = `EGP ${totalRevenue.toFixed(2)}`;
+    if (stats.value[1]) stats.value[1].value = String(confirmedBookings);
+    if (stats.value[2]) stats.value[2].value = String(allUsers.length);
+    if (stats.value[3]) stats.value[3].value = `${occupancy}%`;
+
+    // Update occupancy
+    occupancyRate.value = occupancy;
+    occupiedRooms.value = occupiedRoomsCount;
+    availableRooms.value = availableRoomsCount;
+
+    // Get recent bookings (last 4)
+    recentBookings.value = allBookings
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 4)
+      .map((b) => ({
+        id: b.id,
+        guest_name: `User #${b.user_id}`,
+        room_type: `Room #${b.room_id}`,
+        check_in: b.check_in,
+        status: b.status,
+      }));
+
+    // Set alerts based on data
+    alerts.value = [];
+    const pendingBookings = allBookings.filter((b) => b.status === "pending").length;
+    if (pendingBookings > 0) {
+      alerts.value.push({
+        id: 1,
+        type: "warning",
+        icon: "⚠️",
+        message: `${pendingBookings} bookings pending confirmation`,
+        action: "Review",
+        link: "/admin/bookings",
+      });
+    }
+
+    const maintenanceRooms = allRooms.filter((r) => r.status === "maintenance").length;
+    if (maintenanceRooms > 0) {
+      alerts.value.push({
+        id: 2,
+        type: "info",
+        icon: "ℹ️",
+        message: `${maintenanceRooms} rooms in maintenance`,
+        action: "View",
+        link: "/admin/rooms",
+      });
     }
   } catch (error) {
-    console.error('Failed to fetch dashboard data:', error)
+    console.error("Failed to fetch dashboard data:", error);
   }
-})
+}
+
+onMounted(fetchDashboardData);
 </script>
 
 <style scoped>
@@ -313,7 +383,7 @@ onMounted(async () => {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: conic-gradient(#667eea v-bind('occupancyRate * 3.6')deg, #e5e7eb 0deg);
+  background: conic-gradient(#667eea v-bind("occupancyRate * 3.6") deg, #e5e7eb 0deg);
   display: flex;
   flex-direction: column;
   align-items: center;

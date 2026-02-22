@@ -5,21 +5,20 @@ Run this to populate the database with sample rooms, products, and testimonials
 
 import asyncio
 import logging
+from datetime import datetime, timezone
 from sqlalchemy import select
-from sqlalchemy.orm import sessionmaker
-from app.core.database import engine, Base, get_db
+from app.core.database import AsyncSessionLocal
+from app.core.security import get_password_hash
 from app.models.room import Room, RoomType
-from app.models.product import Product, ProductCategory
-from app.models.review import Review
+from app.models.product import Product, ProductType
+from app.models.user import User, UserRole
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
 async def seed_rooms():
     """Seed rooms with sample data"""
-    async with async_session() as session:
+    async with AsyncSessionLocal() as session:
         # Check if rooms already exist
         result = await session.execute(select(Room))
         if result.scalars().first():
@@ -69,7 +68,7 @@ async def seed_rooms():
             },
             {
                 "room_number": "301",
-                "room_type": RoomType.FAMILY,
+                "room_type": RoomType.VILLA,
                 "description_en": "Family room with connecting rooms, perfect for families with children. Features garden views and kid-friendly amenities.",
                 "description_ar": "غرفة عائلية مع غرف متصلة، مثالية للعائلات ذات الأطفال. تضم إطلالات على الحديقة ووسائل راحة مناسبة للأطفال.",
                 "price_per_night": 180.00,
@@ -79,7 +78,7 @@ async def seed_rooms():
             },
             {
                 "room_number": "401",
-                "room_type": RoomType.PRESIDENTIAL,
+                "room_type": RoomType.VILLA,
                 "description_en": "The ultimate luxury experience. Presidential suite with 3 bedrooms, private pool, butler service, and 360° sea views.",
                 "description_ar": "تجربة فاخرة في أقصى درجاتها. الجناح الرئاسي مع 3 غرف نوم ومسبح خاص وخدمة كونسيرج وإطلالات 360° على البحر.",
                 "price_per_night": 800.00,
@@ -98,7 +97,7 @@ async def seed_rooms():
 
 async def seed_products():
     """Seed products (activities, spa, dining add-ons)"""
-    async with async_session() as session:
+    async with AsyncSessionLocal() as session:
         result = await session.execute(select(Product))
         if result.scalars().first():
             logger.info("Products already seeded, skipping...")
@@ -107,78 +106,75 @@ async def seed_products():
         products_data = [
             {
                 "name": "VIP Beach Access",
+                "name_ar": "وصول VIP للشاطئ",
+                "slug": "vip-beach-access",
+                "type": ProductType.BEACH,
+                "base_price": 65.00,
+                "capacity": 10,
                 "description": "Private cabana with premium amenities including dedicated waiter service",
-                "category": ProductCategory.ACTIVITY,
-                "price": 65.00,
-                "duration_hours": 8,
-                "max_capacity": 10,
-                "is_active": True
+                "description_ar": "كابينة خاصة مع خدمات متميزة وخدمة نادل مخصصة",
+                "duration_minutes": 480,
+                "max_weight_kg": 120,
+                "is_active": True,
+                "updated_at": datetime.now(timezone.utc),
             },
             {
                 "name": "Romantic Beach Dinner",
+                "name_ar": "عشاء رومانسي على الشاطئ",
+                "slug": "romantic-beach-dinner",
+                "type": ProductType.RESTAURANT,
+                "base_price": 150.00,
+                "capacity": 2,
                 "description": "Private candlelit dinner on the beach with personalized menu",
-                "category": ProductCategory.DINING,
-                "price": 150.00,
-                "duration_hours": 3,
-                "max_capacity": 2,
-                "is_active": True
+                "description_ar": "عشاء خاص على الشاطئ مع قائمة شخصية",
+                "duration_minutes": 180,
+                "max_weight_kg": 120,
+                "is_active": True,
+                "updated_at": datetime.now(timezone.utc),
             },
             {
                 "name": "Couples Spa Package",
+                "name_ar": "باقة سبا للأزواج",
+                "slug": "couples-spa-package",
+                "type": ProductType.WATER_ACTIVITY,
+                "base_price": 120.00,
+                "capacity": 2,
                 "description": "60-minute couples massage with aromatherapy and private suite",
-                "category": ProductCategory.SPA,
-                "price": 120.00,
-                "duration_hours": 2,
-                "max_capacity": 2,
-                "is_active": True
+                "description_ar": "تدليك للأزواج 60 دقيقة مع العلاج العطري وغرفة خاصة",
+                "duration_minutes": 120,
+                "max_weight_kg": 120,
+                "is_active": True,
+                "updated_at": datetime.now(timezone.utc),
             },
             {
                 "name": "Sunset Yacht Cruise",
+                "name_ar": "رحلة يخت عند الغروب",
+                "slug": "sunset-yacht-cruise",
+                "type": ProductType.WATER_ACTIVITY,
+                "base_price": 300.00,
+                "capacity": 8,
                 "description": "2-hour private yacht cruise with champagne and canapés",
-                "category": ProductCategory.ACTIVITY,
-                "price": 300.00,
-                "duration_hours": 2,
-                "max_capacity": 8,
-                "is_active": True
+                "description_ar": "رحلة يخت خاصة ساعتين مع الشمبانيا والمقبلات",
+                "duration_minutes": 120,
+                "max_weight_kg": 150,
+                "is_active": True,
+                "updated_at": datetime.now(timezone.utc),
             },
             {
                 "name": "Scuba Diving Experience",
+                "name_ar": "تجربة الغوص",
+                "slug": "scuba-diving-experience",
+                "type": ProductType.WATER_ACTIVITY,
+                "base_price": 85.00,
+                "capacity": 4,
                 "description": "Beginner scuba diving with certified instructor and all equipment",
-                "category": ProductCategory.ACTIVITY,
-                "price": 85.00,
-                "duration_hours": 3,
-                "max_capacity": 4,
-                "is_active": True
+                "description_ar": "غوص للمبتدئين مع مدرب معتمد وجميع المعدات",
+                "duration_minutes": 180,
+                "max_weight_kg": 120,
+                "is_active": True,
+                "updated_at": datetime.now(timezone.utc),
             },
-            {
-                "name": "Kids Club Day Pass",
-                "description": "Full day of supervised activities for children aged 4-12",
-                "category": ProductCategory.ACTIVITY,
-                "price": 35.00,
-                "duration_hours": 8,
-                "max_capacity": 20,
-                "is_active": True
-            },
-            {
-                "name": "Airport Transfer - Premium",
-                "description": "Private luxury car transfer from Sharm El Sheikh Airport",
-                "category": ProductCategory.TRANSPORT,
-                "price": 40.00,
-                "duration_hours": 1,
-                "max_capacity": 4,
-                "is_active": True
-            },
-            {
-                "name": "Desert Safari Adventure",
-                "description": "4x4 desert safari with Bedouin dinner and stargazing",
-                "category": ProductCategory.ACTIVITY,
-                "price": 75.00,
-                "duration_hours": 5,
-                "max_capacity": 6,
-                "is_active": True
-            }
         ]
-        
         for product_data in products_data:
             product = Product(**product_data)
             session.add(product)
@@ -186,63 +182,28 @@ async def seed_products():
         await session.commit()
         logger.info(f"Seeded {len(products_data)} products")
 
-async def seed_reviews():
-    """Seed sample reviews"""
-    async with async_session() as session:
-        result = await session.execute(select(Review))
-        if result.scalars().first():
-            logger.info("Reviews already seeded, skipping...")
+async def seed_admin():
+    """Create admin user if not exists (for login to admin panel)."""
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(User).where(User.email == "admin@alkhayma.com"))
+        if result.scalar_one_or_none():
+            logger.info("Admin user already exists, skipping.")
             return
-        
-        reviews_data = [
-            {
-                "product_id": 1,
-                "user_name": "Sarah Johnson",
-                "rating": 5,
-                "comment": "An absolutely magical experience. The staff went above and beyond to make our anniversary special. The beach is pristine and the rooms are luxurious.",
-                "country": "United Kingdom",
-                "is_approved": True
-            },
-            {
-                "product_id": 1,
-                "user_name": "Ahmed Hassan",
-                "rating": 5,
-                "comment": "Best vacation spot on the Red Sea! The VIP beach experience was worth every penny. Highly recommend for families and couples alike.",
-                "country": "Egypt",
-                "is_approved": True
-            },
-            {
-                "product_id": 1,
-                "user_name": "Marie Dupont",
-                "rating": 5,
-                "comment": "From booking to checkout, everything was perfect. The breakfast buffet is amazing, and the water activities kept my kids entertained all day.",
-                "country": "France",
-                "is_approved": True
-            },
-            {
-                "product_id": 2,
-                "user_name": "John Smith",
-                "rating": 5,
-                "comment": "The romantic dinner on the beach was unforgettable. Perfect proposal spot!",
-                "country": "United States",
-                "is_approved": True
-            },
-            {
-                "product_id": 3,
-                "user_name": "Emma Wilson",
-                "rating": 5,
-                "comment": "The spa treatment was heavenly. Professional staff and beautiful facilities.",
-                "country": "Germany",
-                "is_approved": True
-            }
-        ]
-        
-        for review_data in reviews_data:
-            review = Review(**review_data)
-            session.add(review)
-        
+        admin = User(
+            email="admin@alkhayma.com",
+            hashed_password=get_password_hash("admin123"),
+            full_name="Admin",
+            role=UserRole.ADMIN,
+            is_active=True,
+        )
+        session.add(admin)
         await session.commit()
-        logger.info(f"Seeded {len(reviews_data)} reviews")
+        logger.info("Created admin user: admin@alkhayma.com / admin123")
+
+
+async def seed_reviews():
+    """Reviews require existing users and bookings (booking_id, user_id). Skipped in basic seed."""
+    logger.info("Reviews require existing bookings and users; skipping. Use scripts/archive/seed_database.py for full seed.")
 
 async def seed_all():
     """Run all seed functions"""
@@ -251,6 +212,7 @@ async def seed_all():
     try:
         await seed_rooms()
         await seed_products()
+        await seed_admin()
         await seed_reviews()
         logger.info("Database seeding completed successfully!")
     except Exception as e:
@@ -258,6 +220,4 @@ async def seed_all():
         raise
 
 if __name__ == "__main__":
-    # Import AsyncSession here to avoid circular imports
-    from sqlalchemy.ext.asyncio import AsyncSession
     asyncio.run(seed_all())

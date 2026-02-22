@@ -55,6 +55,7 @@ frontend/.vite/
 # Logs
 *.log
 logs/
+backend/logs/
 backend.log
 ai-service.log
 

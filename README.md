@@ -27,12 +27,15 @@ alkhayma-resort/
 ├── ai-service/        # LangChain + GPT Chatbot
 ├── n8n-workflows/     # WhatsApp + Email Automation
 ├── n8n-setup/         # Professional N8N Docker Setup
-├── docs/              # Documentation (organized by topic)
-│   ├── backend/         # Backend documentation
-│   ├── frontend/        # Frontend documentation
-│   ├── database/        # Database documentation
-│   └── guides/          # Guides and quick starts
-├── monitoring/        # Prometheus + Grafana (TODO)
+├── docs/              # Documentation
+│   ├── INDEX.md         # فهرس التوثيق (ابدأ هنا)
+│   ├── architecture.md, deployment.md, maintenance.md, requirements.md
+│   ├── api/             # مراجع الـ API
+│   ├── guides/          # أدلة البدء والإعداد
+│   ├── backend/, frontend/, database/
+│   └── archive/        # توثيق مراحل المشروع (أرشفة)
+├── backend/scripts/   # سكربتات تشغيلية (seed, reset_admin)
+├── monitoring/        # Prometheus + Grafana
 └── nginx/             # Production Nginx Config
 ```
 
@@ -65,10 +68,10 @@ cp .env.prod .env
 
 ## 📚 Documentation
 
+- **[📑 فهرس التوثيق الكامل](docs/INDEX.md)** — ابدأ من هنا (عربي)
 - [Guides & Quick Starts](docs/guides/)
-- [Frontend Docs](docs/frontend/)
-- [Backend Docs](docs/backend/)
-- [Database Docs](docs/database/)
+- [Architecture](docs/architecture.md) · [Deployment](docs/deployment.md) · [Maintenance](docs/maintenance.md)
+- [Frontend](docs/frontend/) · [Backend](docs/backend/) · [Database](docs/database/)
 
 ## 📊 Current Status
 

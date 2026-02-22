@@ -16,6 +16,7 @@ from app.core.error_handlers import setup_error_handlers, AppException
 from app.core.security_middleware import setup_security_middleware
 from app.api.endpoints import auth, bookings, content, rooms, products, notifications
 from app.api import analytics
+from app.api.loyalty import router as loyalty_router
 from app.services import email_service, whatsapp_service
 
 # Setup logging
@@ -103,6 +104,15 @@ async def health_check():
         "environment": getattr(settings, 'ENVIRONMENT', 'development')
     }
 
+# API Documentation (Swagger UI & ReDoc)
+@app.get("/api/docs", include_in_schema=False)
+async def swagger_ui_html():
+    return get_swagger_ui_html(openapi_url="/api/openapi.json", title="الخيمة API - Docs")
+
+@app.get("/api/redoc", include_in_schema=False)
+async def redoc_html():
+    return get_redoc_html(openapi_url="/api/openapi.json", title="الخيمة API - ReDoc")
+
 # Root endpoint
 @app.get("/", tags=["General"])
 async def root():
@@ -155,4 +165,11 @@ app.include_router(rooms.router, prefix="/api")
 app.include_router(products.router, prefix="/api")
 app.include_router(notifications.router, prefix="/api")
 app.include_router(content.router, prefix="/api")
+app.include_router(loyalty_router, prefix="/api")
 app.include_router(analytics.router)
+
+
+@app.get("/api/reviews/my-reviews", tags=["reviews"])
+async def get_my_reviews():
+    """Stub for frontend: user's reviews (empty until implemented)."""
+    return []

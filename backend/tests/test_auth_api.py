@@ -7,9 +7,11 @@ from app.main import app
 async def test_health_check():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/health")
+        response = await client.get("/api/health")
         assert response.status_code == 200
-        assert response.json() == {"status": "healthy"}
+        data = response.json()
+        assert data.get("status") == "ok"
+        assert "db" in data and "redis" in data
 
 
 @pytest.mark.asyncio
@@ -17,7 +19,7 @@ async def test_register_user():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
-            "/auth/register",
+            "/api/auth/register",
             json={
                 "email": "newuser@test.com",
                 "password": "password123",
@@ -39,7 +41,7 @@ async def test_login_user():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         # First register
         await client.post(
-            "/auth/register",
+            "/api/auth/register",
             json={
                 "email": "logintest@test.com",
                 "password": "password123",
@@ -49,7 +51,7 @@ async def test_login_user():
         
         # Then login
         response = await client.post(
-            "/auth/login",
+            "/api/auth/login",
             json={
                 "email": "logintest@test.com",
                 "password": "password123"
@@ -67,7 +69,7 @@ async def test_get_current_user():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         # Register and login
         await client.post(
-            "/auth/register",
+            "/api/auth/register",
             json={
                 "email": "metest@test.com",
                 "password": "password123",
@@ -76,7 +78,7 @@ async def test_get_current_user():
         )
         
         login_response = await client.post(
-            "/auth/login",
+            "/api/auth/login",
             json={
                 "email": "metest@test.com",
                 "password": "password123"
@@ -86,7 +88,7 @@ async def test_get_current_user():
         
         # Get current user
         response = await client.get(
-            "/auth/me",
+            "/api/auth/me",
             headers={"Authorization": f"Bearer {token}"}
         )
         assert response.status_code == 200
@@ -100,9 +102,9 @@ async def test_login_wrong_password():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
-            "/auth/login",
+            "/api/auth/login",
             json={
-                "email": "admin@alkhaima.com",
+                "email": "admin@alkhayma.com",
                 "password": "wrongpassword"
             }
         )

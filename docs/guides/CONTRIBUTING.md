@@ -7,39 +7,53 @@ Thank you for your interest in contributing to الخيمة Beach Resort booking
 1. **Clone and Setup**
    ```bash
    git clone <repository-url>
-   cd resort-platform
-   make setup
+   cd alkhayma-resort
+   cp .env.example .env   # ثم عدّل القيم
    ```
 
-2. **Start Development**
+2. **Backend**
    ```bash
-   ./start.sh
-   # or
-   make dev
+   cd backend && python -m venv venv && source venv/bin/activate
+   pip install -r requirements.txt
+   alembic upgrade head
+   python -m app.core.seed_data   # تهيئة بيانات تجريبية
+   uvicorn app.main:app --reload
    ```
+
+3. **Frontend**
+   ```bash
+   cd frontend && npm install && npm run dev
+   ```
+
+4. **سكربتات مساعدة** (من مجلد `backend`):
+   - تهيئة البيانات: `python -m app.core.seed_data`
+   - إعادة تعيين كلمة مرور المدير: `python scripts/reset_admin.py`
 
 ## 📁 Project Structure
 
 ```
-resort-platform/
-├── backend/           # FastAPI + SQLAlchemy
+alkhayma-resort/
+├── backend/              # FastAPI + SQLAlchemy + PostgreSQL
 │   ├── app/
-│   │   ├── api/       # API routes
-│   │   ├── models/    # Database models
-│   │   ├── core/      # Core configuration
-│   │   └── main.py    # FastAPI app
-│   ├── tests/         # Backend tests
-│   └── alembic/       # Database migrations
-├── frontend/          # Vue 3 + TypeScript
-│   ├── src/
-│   │   ├── components/
-│   │   ├── views/
-│   │   ├── stores/    # Pinia stores
-│   │   └── api/       # API client
-│   └── tests/         # Frontend tests
-├── ai-service/        # LangChain chatbot
-├── n8n-workflows/     # Automation workflows
-└── monitoring/        # Prometheus + Grafana
+│   │   ├── api/endpoints/ # API routes
+│   │   ├── core/         # Config, database, security, seed_data
+│   │   ├── models/       # SQLAlchemy models
+│   │   ├── repositories/ # Data access
+│   │   ├── schemas/      # Pydantic schemas
+│   │   └── services/     # Business logic
+│   ├── scripts/          # تشغيل: seed، reset_admin
+│   ├── tests/
+│   └── alembic/
+├── frontend/             # Vue 3 + TypeScript + Tailwind
+│   └── src/
+│       ├── components/   # مكونات عامة + smart/
+│       ├── pages/        # الصفحات + admin/
+│       ├── stores/       # Pinia
+│       └── api/          # API client
+├── docs/                 # التوثيق (ابدأ من docs/INDEX.md)
+├── ai-service/           # LangChain chatbot
+├── n8n-workflows/        # Automation workflows
+└── monitoring/           # Prometheus + Grafana
 ```
 
 ## 🛠️ Development Guidelines
