@@ -13,7 +13,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    hashed_password = Column("password_hash", String, nullable=False)
     full_name = Column(String, nullable=False)
     phone = Column(String, nullable=True)
     role = Column(SQLEnum(UserRole), default=UserRole.GUEST, nullable=False)
